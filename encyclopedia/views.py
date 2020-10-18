@@ -1,4 +1,5 @@
 import random
+import markdown2
 from django import forms
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -27,6 +28,7 @@ def index(request):
 def entry(request, title):
 
     content = util.get_entry(title)
+    content = markdown2.markdown(text=content)
     if content:
         return render(request, "encyclopedia/entry.html", {
             "content": content,
@@ -43,6 +45,7 @@ def search(request):
 
     title = request.GET['q']
     content = util.get_entry(title)
+    content = markdown2.markdown(text=content)
 
     if content:
         return render(request, "encyclopedia/entry.html", {
@@ -60,6 +63,7 @@ def random_page(request):
 
     title = random.choice(util.list_entries())
     content = util.get_entry(title)
+    content = markdown2.markdown(text=content)
 
     return render(request, "encyclopedia/entry.html", {
         "content": content,
@@ -112,6 +116,7 @@ def edit(request, title):
             content = form.cleaned_data["content"]
             util.save_entry(title, content)
 
+            content = markdown2.markdown(text=content)
             return render(request, "encyclopedia/entry.html", {
                 "content": content,
                 "title": title,

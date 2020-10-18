@@ -6,7 +6,7 @@
 
 {% block body %}
 
-<a href="{% url 'encyclopedia:edit' title %}"> Edit page </a>  
-<h1>{{ content }}</h1>
+<a href="{% url 'encyclopedia:edit' title %}"> Edit page </a>
+{{ content | safe }}
 
 {% endblock %}
