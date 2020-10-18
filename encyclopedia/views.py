@@ -28,14 +28,15 @@ def index(request):
 def entry(request, title):
 
     content = util.get_entry(title)
-    content = markdown2.markdown(text=content)
+    
     if content:
+        content = markdown2.markdown(text=content)
         return render(request, "encyclopedia/entry.html", {
             "content": content,
             "title": title,
         })
     else:
-        message = f"The {title} page was not in the database."
+        message = f'The "{title}" page was not in the database.'
         return render(request, "encyclopedia/error.html", {
             "message": message,
         })
@@ -45,15 +46,24 @@ def search(request):
 
     title = request.GET['q']
     content = util.get_entry(title)
-    content = markdown2.markdown(text=content)
-
+    
     if content:
+        content = markdown2.markdown(text=content)
         return render(request, "encyclopedia/entry.html", {
             "content": content,
             "title": title,
         })
+    
+    entries = util.list_entries()
+    results = [entry for entry in entries if title.lower() in entry.lower()]
+    
+    if results:
+        return render(request, "encyclopedia/results.html", {
+            "entries": results,
+        })
+ 
     else:
-        message = f"The {title} page was not found."
+        message = f'There is no page containing "{title}" in the database.'
         return render(request, "encyclopedia/error.html", {
             "message": message,
         })
@@ -83,7 +93,7 @@ def new(request):
 
             if title in util.list_entries():
 
-                message = f'The is already an article with the title:"{title}"\
+                message = f'There is already a page with the title:"{title}"\
                 in the database.'
 
                 return render(request, "encyclopedia/error.html", {
@@ -138,7 +148,7 @@ def edit(request, title):
         })
 
 
-def error(request, message):
+def error_handler(request, message):
 
     return render(request, "encyclopedia/error.html", {
         "message": message,
