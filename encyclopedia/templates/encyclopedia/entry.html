@@ -6,10 +6,7 @@
 
 {% block body %}
 
-{% if content %}
-    <h1>{{ content }}</h1>
-{% else %}
-    <h1>The requested page was not found.</h1>
-{% endif %}
+<a href="{% url 'encyclopedia:edit' title %}"> Edit page </a>  
+<h1>{{ content }}</h1>
 
 {% endblock %}

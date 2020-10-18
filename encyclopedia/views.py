@@ -5,10 +5,17 @@ from django.shortcuts import render
 from django.urls import reverse
 from . import util
 
+
 class NewForm(forms.Form):
     """New form"""
     title = forms.CharField(label="Title")
-    content = forms.CharField(widget= forms.Textarea, label="Content")
+    content = forms.CharField(widget=forms.Textarea, label="Content")
+
+
+class EditForm(forms.Form):
+    """Edit form"""
+    content = forms.CharField(widget=forms.Textarea, label="Content")
+
 
 def index(request):
 
@@ -23,57 +30,62 @@ def entry(request, title):
     if content:
         return render(request, "encyclopedia/entry.html", {
             "content": content,
-            "title" : title,
-            })
+            "title": title,
+        })
     else:
-            message = f"The {title} page was not in the database."
-            return render(request, "encyclopedia/error.html", {
+        message = f"The {title} page was not in the database."
+        return render(request, "encyclopedia/error.html", {
             "message": message,
-            })
+        })
 
-def search(request): 
+
+def search(request):
 
     title = request.GET['q']
     content = util.get_entry(title)
-    
+
     if content:
         return render(request, "encyclopedia/entry.html", {
             "content": content,
-            "title" : title,
-            })
+            "title": title,
+        })
     else:
-            message = f"The {title} page was not found."
-            return render(request, "encyclopedia/error.html", {
+        message = f"The {title} page was not found."
+        return render(request, "encyclopedia/error.html", {
             "message": message,
-            })
+        })
 
-def random_page(request): 
+
+def random_page(request):
 
     title = random.choice(util.list_entries())
     content = util.get_entry(title)
-    
+
     return render(request, "encyclopedia/entry.html", {
         "content": content,
-        "title" : title,
+        "title": title,
     })
 
-def new(request): 
+
+def new(request):
 
     if request.method == "POST":
-        
+
         form = NewForm(request.POST)
-        
+
         if form.is_valid():
-            
+
             title = form.cleaned_data["title"]
 
             if title in util.list_entries():
-                
-                message = f'The is already an article with the title:"{title}" in the database.'
+
+                message = f'The is already an article with the title:"{title}"\
+                in the database.'
+
                 return render(request, "encyclopedia/error.html", {
-                "message": message,
+                    "message": message,
                 })
-            
+
             else:
 
                 content = form.cleaned_data["content"]
@@ -88,7 +100,40 @@ def new(request):
             "form": NewForm()
         })
 
-def error(request, message): 
+
+def edit(request, title):
+
+    if request.method == "POST":
+
+        form = EditForm(request.POST)
+
+        if form.is_valid():
+
+            content = form.cleaned_data["content"]
+            util.save_entry(title, content)
+
+            return render(request, "encyclopedia/entry.html", {
+                "content": content,
+                "title": title,
+            })
+
+        else:
+            return render(request, "encyclopedia/edit.html", {
+                "form": form,
+                "title": title,
+            })
+    else:
+
+        content = util.get_entry(title)
+        form = EditForm(initial={'content': content})
+
+        return render(request, "encyclopedia/edit.html", {
+            "form": form,
+            "title": title,
+        })
+
+
+def error(request, message):
 
     return render(request, "encyclopedia/error.html", {
         "message": message,
