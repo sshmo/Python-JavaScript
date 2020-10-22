@@ -4,8 +4,19 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django import forms
 
-from .models import User
+from .models import User, Listings
+
+
+class CreateForm(forms.Form):
+    """Create Form"""
+
+    title = forms.CharField(label="Title")
+    description = forms.CharField(widget=forms.Textarea, label="description")
+    starting_bid = forms.DecimalField(max_digits=6, decimal_places=2)
+    image = forms.URLField(required=False)
+    categury = forms.CharField(label="Categury", required=False)
 
 
 def index(request):
@@ -76,5 +87,41 @@ def watchlist(request):
 
 @login_required
 def create_listings(request):
-    return render(request, "auctions/create.html")
 
+    if request.method == "POST":
+
+        form = CreateForm(request.POST)
+
+        if form.is_valid():
+
+            user = User.objects.get(pk=int(request.user.id))
+            listings = Listings()
+
+            listings.user = user
+            listings.title = form.cleaned_data["title"]
+            listings.description = form.cleaned_data["description"]
+            listings.starting_bid = form.cleaned_data["starting_bid"]
+            listings.image = form.cleaned_data["image"]
+            listings.categury = form.cleaned_data["categury"]
+
+            listings.save()
+
+            # util.save_entry(title, content)
+            return HttpResponseRedirect(reverse("auctions:index"))
+
+        else:
+            return render(request, "auctions/create.html", {
+                "form": form
+            })
+    else:
+        return render(request, "auctions/create.html", {
+            "form": CreateForm()
+        })
+
+
+
+def error_handler(request, message):
+
+    return render(request, "encyclopedia/error.html", {
+        "message": message,
+    })
