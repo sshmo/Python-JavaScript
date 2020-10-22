@@ -1,3 +1,7 @@
+"""
+This module contains urls.
+"""
+
 from django.urls import path
 
 from . import views
@@ -13,4 +17,5 @@ urlpatterns = [
     path("watchlist", views.watchlist, name="watchlist"),
     path("create", views.create_listings, name="create"),
     path("error/", views.error_handler, name="error"),
+    path("listing/<int:listing_id>", views.listing, name="listing"),
 ]

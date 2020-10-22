@@ -1,0 +1,18 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+<ul>
+    <li> Title: {{title}} </li>
+    <li> Description: {{description}} </li>
+    <li> Bid: {{starting_bid}} $ </li>
+    {% if image != ""%}
+        <p> <img src={{image}} alt="No image available" width="200"> </p>
+    {%endif%}
+    
+    <li> Categury: {{categury}} </li>
+</ul>
+{% endblock %}

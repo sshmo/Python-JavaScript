@@ -1,7 +1,11 @@
+"""
+This module contains the route handlers and forms.
+"""
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
@@ -13,17 +17,25 @@ class CreateForm(forms.Form):
     """Create Form"""
 
     title = forms.CharField(label="Title")
-    description = forms.CharField(widget=forms.Textarea, label="description")
+    description = forms.CharField(widget=forms.TextInput, label="description")
     starting_bid = forms.DecimalField(max_digits=6, decimal_places=2)
     image = forms.URLField(required=False)
     categury = forms.CharField(label="Categury", required=False)
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    """Index route handler"""
+
+    items = Listings.objects.all()
+
+    return render(request, "auctions/index.html",{
+        'items':items
+    })
 
 
 def login_view(request):
+    """Login route handler"""
+
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -44,11 +56,15 @@ def login_view(request):
 
 
 def logout_view(request):
+    """logout route handler"""
+
     logout(request)
     return HttpResponseRedirect(reverse("auctions:index"))
 
 
 def register(request):
+    """register route handler"""
+
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -75,18 +91,51 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+def listing(request, listing_id):
+    """Listing route handler"""
+
+    listing_obj = Listings.objects.get(pk=int(listing_id))
+
+    if listing_obj:
+
+        title = listing_obj.title
+        description = listing_obj.description
+        starting_bid = listing_obj.starting_bid
+        image = listing_obj.image
+        categury = listing_obj.categury
+
+        return render(request, "auctions/listing.html", {
+            "title": title,
+            "description" : description,
+            "starting_bid" : starting_bid,
+            "image" : image,
+            "categury" : categury,
+        })
+
+    else:
+        message = f'The "{listing_id}" page was not in the database.'
+        return render(request, "auctions/error.html", {
+            "message": message,
+        })
+
+
 @login_required
 def categuries(request):
+    """Categuries route handler"""
+
     return render(request, "auctions/categuries.html")
 
 
 @login_required
 def watchlist(request):
+    """Watchlist route handler"""
+
     return render(request, "auctions/watchlist.html")
 
 
 @login_required
 def create_listings(request):
+    """Creat route handler"""
 
     if request.method == "POST":
 
@@ -121,6 +170,7 @@ def create_listings(request):
 
 
 def error_handler(request, message):
+    """Error route handler"""
 
     return render(request, "encyclopedia/error.html", {
         "message": message,

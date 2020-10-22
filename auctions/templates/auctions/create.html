@@ -2,12 +2,23 @@
 
 {% block body %}
     
-    <h3>Create listing</h3>
+    <h3>Create a new listing</h3>
     
-    <form action="{% url 'auctions:create' %}" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="create">
+    <form  action="{% url 'auctions:create' %}" method="post">
+        <div class="form-group">
+            {% csrf_token %}
+            <div> Title:{{ form.title }} </div>
+            <p></p>
+            <div> Description:{{ form.description }} </div>
+            <p></p>
+            <div> Starting bid:{{ form.starting_bid }} $</div>
+            <p></p>
+            <div> Image url:{{ form.image }} </div>
+            <p></p>
+            <div> Categury:{{ form.categury }} </div>
+            <p></p>
+            <input type="submit" value="create">
+        </div>
     </form>
     
 {% endblock %}

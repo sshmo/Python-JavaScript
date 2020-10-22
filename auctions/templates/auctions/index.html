@@ -4,6 +4,23 @@
 
     <h3>Active Listings</h3>
 
-    TODO
+    
+        {% for item in items %}
+        <div class="border rounded mb-0">
+                {% if item.image != ""%}
+                    <img src={{item.image}} alt="No image available" width="200">
+                {%endif%}
+
+                <p>
+                    <a href="{% url 'auctions:listing' item.id %}">{{ item.title }}</a>
+                </p>
+                <p>
+                    Price {{ item.starting_bid }} $
+                </p>
+                
+        </div>
+        <p></p>
+        {% endfor %}
+    
     
 {% endblock %}
