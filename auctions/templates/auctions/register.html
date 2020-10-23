@@ -2,8 +2,6 @@
 
 {% block body %}
 
-    <h3>Register</h3>
-
     {% if message %}
         <div>{{ message }}</div>
     {% endif %}
@@ -24,7 +22,7 @@
         </div>
         <input class="btn btn-primary" type="submit" value="Register">
     </form>
-
+    <p></p>
     Already have an account? <a href="{% url 'auctions:login' %}">Log In here.</a>
 
 {% endblock %}

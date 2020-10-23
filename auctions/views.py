@@ -16,11 +16,20 @@ from .models import User, Listings
 class CreateForm(forms.Form):
     """Create Form"""
 
-    title = forms.CharField(label="Title")
-    description = forms.CharField(widget=forms.TextInput, label="description")
-    starting_bid = forms.DecimalField(max_digits=6, decimal_places=2)
-    image = forms.URLField(required=False)
-    categury = forms.CharField(label="Categury", required=False)
+    title = forms.CharField(label="Title",
+        widget=forms.TextInput(attrs={'placeholder': 'Title'}))
+
+    description = forms.CharField(label="description",
+        widget=forms.TextInput(attrs={'placeholder': 'Description'}))
+
+    starting_bid = forms.DecimalField(max_digits=6, decimal_places=2,
+        widget=forms.NumberInput(attrs={'placeholder': 'Starting bid ($)'}))
+
+    image = forms.URLField(required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Image url'}))
+
+    categury = forms.CharField(label="Categury", required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Categury'}))
 
 
 def index(request):
@@ -28,8 +37,8 @@ def index(request):
 
     items = Listings.objects.all()
 
-    return render(request, "auctions/index.html",{
-        'items':items
+    return render(request, "auctions/index.html", {
+        'items': items
     })
 
 
@@ -106,10 +115,11 @@ def listing(request, listing_id):
 
         return render(request, "auctions/listing.html", {
             "title": title,
-            "description" : description,
-            "starting_bid" : starting_bid,
-            "image" : image,
-            "categury" : categury,
+            "description": description,
+            "starting_bid": starting_bid,
+            "image": image,
+            "categury": categury,
+            "id": listing_id,
         })
 
     else:
@@ -166,7 +176,6 @@ def create_listings(request):
         return render(request, "auctions/create.html", {
             "form": CreateForm()
         })
-
 
 
 def error_handler(request, message):

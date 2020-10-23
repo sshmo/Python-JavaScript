@@ -1,24 +1,18 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    
     <h3>Create a new listing</h3>
-    
-    <form  action="{% url 'auctions:create' %}" method="post">
-        <div class="form-group">
-            {% csrf_token %}
-            <div> Title:{{ form.title }} </div>
-            <p></p>
-            <div> Description:{{ form.description }} </div>
-            <p></p>
-            <div> Starting bid:{{ form.starting_bid }} $</div>
-            <p></p>
-            <div> Image url:{{ form.image }} </div>
-            <p></p>
-            <div> Categury:{{ form.categury }} </div>
-            <p></p>
-            <input type="submit" value="create">
-        </div>
-    </form>
-    
+    <div class="ml-2">
+        <form  action="{% url 'auctions:create' %}" method="post">
+            <div class="form-group">
+                {% csrf_token %}
+                <div class="form-group"> {{ form.title }} </div>
+                <div class="form-group"> {{ form.description }} </div>
+                <div class="form-group"> {{ form.starting_bid }} </div>
+                <div class="form-group">{{ form.image }} </div>
+                <div class="form-group"> {{ form.categury }} </div>
+                <input type="submit" value="create">
+            </div>
+        </form>
+    </div>  
 {% endblock %}

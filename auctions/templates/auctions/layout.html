@@ -2,50 +2,70 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>{% block title %}Auctions{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
-    </head>
-    <body>
+  <head>
+    <title>{% block title %}Auctions{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link href="{% static 'auctions/styles.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+
+    <div class="d-flex">
+    
+    <img src="{% static 'auctions/hammer.png' %}" alt="No image available" width="40" height="40">
+
+    <div class="p-1">
         <h2>Auctions</h2>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
-            {% else %}
-                Not signed in.
-            {% endif %}
+    </div>
+
+      <div class="p-1">
+        <a class="nav-link" href="{% url 'auctions:index' %}">Active Listings</a>
+      </div>
+
+      {% if user.is_authenticated %}
+
+        <div class="p-1">
+            <a class="nav-link" href="{% url 'auctions:categuries' %}">Categuries</a>
         </div>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'auctions:index' %}">Active Listings</a>
-            </li>
-            {% if user.is_authenticated %}
+        <div class="p-1">
+            <a class="nav-link" href="{% url 'auctions:watchlist' %}">Watchlist</a>
+        </div>
+        <div class="p-1">
+            <a class="nav-link" href="{% url 'auctions:create' %}">Create</a>
+        </div>
+        <div class="p-1 ml-auto">
+            <a class="nav-link" href="{% url 'auctions:logout' %}">Log Out</a>
+        </div>
 
-                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:categuries' %}">Categuries</a>
-                </li>
-                                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:watchlist' %}">Watchlist</a>
-                </li>
-                                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:create' %}">Create</a>
-                </li>               
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:logout' %}">Log Out</a>
-                </li>
+      {% else %}
 
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:login' %}">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:register' %}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
-        <hr>
-        {% block body %}
-        {% endblock %}
-    </body>
+        <div class="p-1 ml-auto">
+            <a class="nav-link" href="{% url 'auctions:login' %}">Log In</a>
+        </div>
+        <div class="p-1 ml-1">
+            <a class="nav-link" href="{% url 'auctions:register' %}">Register</a>
+        </div>
+
+      {% endif %}
+    </div>
+
+    <div class="d-flex">
+      <div class="p-1 mr-auto">
+        {% if user.is_authenticated %} 
+            Signed in as <strong>{{ user.username }}</strong>. 
+        {% else %} 
+            Not signed in.
+        {% endif%}
+      </div>
+    </div>
+
+    <hr>
+        <main class="container p-5">
+            {% block body %} {% endblock %}
+        </main>
+  </body>
 </html>
