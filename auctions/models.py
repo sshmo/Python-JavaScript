@@ -19,6 +19,7 @@ class Listings(models.Model):
     image = models.URLField(max_length=200)  # Not using ImageFeild to avoid Pillow dependency.
     categury = models.CharField(max_length=64)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    watchers = models.ManyToManyField(User)
 
     def __str__(self):
         return f"{self.title} ({self.categury})"

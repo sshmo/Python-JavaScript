@@ -106,21 +106,68 @@ def listing(request, listing_id):
     listing_obj = Listings.objects.get(pk=int(listing_id))
 
     if listing_obj:
-
         title = listing_obj.title
         description = listing_obj.description
         starting_bid = listing_obj.starting_bid
         image = listing_obj.image
         categury = listing_obj.categury
 
-        return render(request, "auctions/listing.html", {
-            "title": title,
-            "description": description,
-            "starting_bid": starting_bid,
-            "image": image,
-            "categury": categury,
-            "id": listing_id,
-        })
+        if request.user.id:
+
+            user = User.objects.get(pk=int(request.user.id))
+            watchers = listing_obj.watchers.all()
+
+            if request.method == "POST":
+
+                if user in watchers:
+                    listing_obj.watchers.remove(user)
+                    value = "add"
+                    color = "success"
+                else:
+                    listing_obj.watchers.add(user)
+                    value = "remove"
+                    color = "danger"
+
+                return render(request, "auctions/listing.html", {
+                    "title": title,
+                    "description": description,
+                    "starting_bid": starting_bid,
+                    "image": image,
+                    "categury": categury,
+                    "id": listing_id,
+                    "value": value,
+                    "color": color,
+                })
+
+            else:
+
+                if user in watchers:
+                    value = "remove"
+                    color = "danger"
+                else:
+                    value = "add"
+                    color = "success"
+
+                return render(request, "auctions/listing.html", {
+                    "title": title,
+                    "description": description,
+                    "starting_bid": starting_bid,
+                    "image": image,
+                    "categury": categury,
+                    "id": listing_id,
+                    "value": value,
+                    "color": color,
+                })
+
+        else:
+            return render(request, "auctions/listing.html", {
+                "title": title,
+                "description": description,
+                "starting_bid": starting_bid,
+                "image": image,
+                "categury": categury,
+                "id": listing_id,
+            })
 
     else:
         message = f'The "{listing_id}" page was not in the database.'
@@ -140,7 +187,12 @@ def categuries(request):
 def watchlist(request):
     """Watchlist route handler"""
 
-    return render(request, "auctions/watchlist.html")
+    user = User.objects.get(pk=int(request.user.id))
+    items = user.listings_set.all()
+
+    return render(request, "auctions/watchlist.html", {
+        "items": items
+    })
 
 
 @login_required
