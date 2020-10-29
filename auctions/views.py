@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django import forms
 
-from .models import User, Listings
+from .models import User, Listings, Bids
 
 
 class CreateForm(forms.Form):
@@ -22,7 +22,7 @@ class CreateForm(forms.Form):
     description = forms.CharField(label="description",
         widget=forms.TextInput(attrs={'placeholder': 'Description'}))
 
-    starting_bid = forms.DecimalField(max_digits=6, decimal_places=2,
+    current_bid = forms.DecimalField(max_digits=6, decimal_places=2,
         widget=forms.NumberInput(attrs={'placeholder': 'Starting bid ($)'}))
 
     image = forms.URLField(required=False,
@@ -30,6 +30,13 @@ class CreateForm(forms.Form):
 
     categury = forms.CharField(label="Categury", required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Categury'}))
+
+
+class BidForm(forms.Form):
+    """Bid Form"""
+
+    bid = forms.DecimalField(max_digits=6, decimal_places=2,
+        widget=forms.NumberInput(attrs={'placeholder': 'Place your bid ($)'}))
 
 
 def index(request):
@@ -103,78 +110,125 @@ def register(request):
 def listing(request, listing_id):
     """Listing route handler"""
 
-    listing_obj = Listings.objects.get(pk=int(listing_id))
+    listing_obj, context = l_context(request, listing_id)
 
-    if listing_obj:
-        title = listing_obj.title
-        description = listing_obj.description
-        starting_bid = listing_obj.starting_bid
-        image = listing_obj.image
-        categury = listing_obj.categury
-
-        if request.user.id:
-
-            user = User.objects.get(pk=int(request.user.id))
-            watchers = listing_obj.watchers.all()
-
-            if request.method == "POST":
-
-                if user in watchers:
-                    listing_obj.watchers.remove(user)
-                    value = "add"
-                    color = "success"
-                else:
-                    listing_obj.watchers.add(user)
-                    value = "remove"
-                    color = "danger"
-
-                return render(request, "auctions/listing.html", {
-                    "title": title,
-                    "description": description,
-                    "starting_bid": starting_bid,
-                    "image": image,
-                    "categury": categury,
-                    "id": listing_id,
-                    "value": value,
-                    "color": color,
-                })
-
-            else:
-
-                if user in watchers:
-                    value = "remove"
-                    color = "danger"
-                else:
-                    value = "add"
-                    color = "success"
-
-                return render(request, "auctions/listing.html", {
-                    "title": title,
-                    "description": description,
-                    "starting_bid": starting_bid,
-                    "image": image,
-                    "categury": categury,
-                    "id": listing_id,
-                    "value": value,
-                    "color": color,
-                })
-
-        else:
-            return render(request, "auctions/listing.html", {
-                "title": title,
-                "description": description,
-                "starting_bid": starting_bid,
-                "image": image,
-                "categury": categury,
-                "id": listing_id,
-            })
-
-    else:
+    if not context:
         message = f'The "{listing_id}" page was not in the database.'
         return render(request, "auctions/error.html", {
             "message": message,
         })
 
+    watchers = listing_obj.watchers.all()
+    user, user_context = u_context(request, watchers, context)
+
+    if not user_context:
+        return render(request, "auctions/listing.html", context)
+
+    if request.method == "POST":
+
+        wacth(request, user, watchers, listing_obj, context)
+
+        message = place_bid(request,listing_obj, user, context)
+        
+        if message=="Invalid bid":
+            return render(request, "auctions/error.html", {
+                "message": message,
+            })
+
+    return render(request, "auctions/listing.html", context)
+
+
+def l_context(request, listing_id):
+    """listing id context maker"""
+
+    listing_obj = Listings.objects.get(pk=int(listing_id))
+
+    if listing_obj:
+        context = {
+            "title" : listing_obj.title,
+            "description" : listing_obj.description,
+            "current_bid" : listing_obj.current_bid,
+            "image" : listing_obj.image,
+            "categury" : listing_obj.categury,
+            "form" : BidForm(prefix='bid'),
+            "id":listing_id,
+        }
+
+        return listing_obj, context
+
+    return None, None
+
+
+def u_context(request, watchers, context):
+    """listing user context maker"""
+
+    if request.user.id:
+
+        user = User.objects.get(pk=int(request.user.id))
+
+        if user in watchers:
+            value = "remove"
+            color = "danger"
+        else:
+            value = "add"
+            color = "success"
+
+        context["value"] = value
+        context["color"] = color
+
+        return user, context
+
+    return None, None
+
+
+def wacth(request, user,  watchers,listing_obj, context):
+    """add/remove watch list handler"""
+
+    if 'watch' in request.POST:
+
+        if user in watchers:
+            listing_obj.watchers.remove(user)
+            value = "add"
+            color = "success"
+        else:
+            listing_obj.watchers.add(user)
+            value = "remove"
+            color = "danger"
+
+        context["value"] = value
+        context["color"] = color
+
+
+def place_bid(request,listing_obj, user, context):
+    """add new bid handler"""
+
+    if 'bid' in request.POST:
+
+        form = BidForm(request.POST, prefix='bid')
+
+        if form.is_valid():
+
+            current_bid = form.cleaned_data["bid"]
+
+            if current_bid > listing_obj.current_bid:
+
+                bids = Bids()
+                bids.user = user
+                bids.listing = listing_obj
+                bids.bid = current_bid
+                bids.save()
+
+                listing_obj.current_bid = current_bid
+                listing_obj.save()
+
+                context["current_bid"] = current_bid
+
+            else:
+                return "Invalid bid"
+
+        else:
+            context["form"] = form
+    return None
 
 @login_required
 def categuries(request):
@@ -211,7 +265,7 @@ def create_listings(request):
             listings.user = user
             listings.title = form.cleaned_data["title"]
             listings.description = form.cleaned_data["description"]
-            listings.starting_bid = form.cleaned_data["starting_bid"]
+            listings.current_bid = form.cleaned_data["current_bid"]
             listings.image = form.cleaned_data["image"]
             listings.categury = form.cleaned_data["categury"]
 
