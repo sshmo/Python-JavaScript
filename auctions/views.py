@@ -128,9 +128,9 @@ def listing(request, listing_id):
 
         wacth(request, user, watchers, listing_obj, context)
 
-        message = place_bid(request,listing_obj, user, context)
-        
-        if message=="Invalid bid":
+        message = place_bid(request, listing_obj, user, context)
+
+        if message == "Invalid bid":
             return render(request, "auctions/error.html", {
                 "message": message,
             })
@@ -145,13 +145,13 @@ def l_context(request, listing_id):
 
     if listing_obj:
         context = {
-            "title" : listing_obj.title,
-            "description" : listing_obj.description,
-            "current_bid" : listing_obj.current_bid,
-            "image" : listing_obj.image,
-            "categury" : listing_obj.categury,
-            "form" : BidForm(prefix='bid'),
-            "id":listing_id,
+            "title": listing_obj.title,
+            "description": listing_obj.description,
+            "current_bid": listing_obj.current_bid,
+            "image": listing_obj.image,
+            "categury": listing_obj.categury,
+            "form": BidForm(prefix='bid'),
+            "id": listing_id,
         }
 
         return listing_obj, context
@@ -181,7 +181,7 @@ def u_context(request, watchers, context):
     return None, None
 
 
-def wacth(request, user,  watchers,listing_obj, context):
+def wacth(request, user,  watchers, listing_obj, context):
     """add/remove watch list handler"""
 
     if 'watch' in request.POST:
@@ -199,7 +199,7 @@ def wacth(request, user,  watchers,listing_obj, context):
         context["color"] = color
 
 
-def place_bid(request,listing_obj, user, context):
+def place_bid(request, listing_obj, user, context):
     """add new bid handler"""
 
     if 'bid' in request.POST:
@@ -210,10 +210,13 @@ def place_bid(request,listing_obj, user, context):
 
             current_bid = form.cleaned_data["bid"]
 
-            if current_bid > listing_obj.current_bid:
+            bids = Bids.objects.get()
+
+            if (current_bid > listing_obj.current_bid)\
+                or (current_bid == listing_obj.current_bid == listing_obj.starting_bid):
 
                 bids = Bids()
-                bids.user = user
+                bids.bidder = user
                 bids.listing = listing_obj
                 bids.bid = current_bid
                 bids.save()
@@ -229,6 +232,7 @@ def place_bid(request,listing_obj, user, context):
         else:
             context["form"] = form
     return None
+
 
 @login_required
 def categuries(request):
@@ -262,9 +266,10 @@ def create_listings(request):
             user = User.objects.get(pk=int(request.user.id))
             listings = Listings()
 
-            listings.user = user
+            listings.creator = user
             listings.title = form.cleaned_data["title"]
             listings.description = form.cleaned_data["description"]
+            listings.starting_bid = form.cleaned_data["current_bid"]
             listings.current_bid = form.cleaned_data["current_bid"]
             listings.image = form.cleaned_data["image"]
             listings.categury = form.cleaned_data["categury"]

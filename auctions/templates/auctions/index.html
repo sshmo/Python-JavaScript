@@ -20,6 +20,12 @@
             <div class="p-1 mx-auto my-auto">
                 Price {{ item.current_bid }} $
             </div>
+            <div class="p-1 mx-auto my-auto text-secondary">
+                <small>
+                Created 
+                <p> {{ item.creation_time }} <p>
+                </small>
+            </div>
         </div>
         <p></p>
         {% endfor %}
