@@ -17,26 +17,26 @@ class CreateForm(forms.Form):
     """Create Form"""
 
     title = forms.CharField(label="Title",
-        widget=forms.TextInput(attrs={'placeholder': 'Title'}))
+                            widget=forms.TextInput(attrs={'placeholder': 'Title'}))
 
     description = forms.CharField(label="description",
-        widget=forms.TextInput(attrs={'placeholder': 'Description'}))
+                                  widget=forms.TextInput(attrs={'placeholder': 'Description'}))
 
     current_bid = forms.DecimalField(max_digits=6, decimal_places=2,
-        widget=forms.NumberInput(attrs={'placeholder': 'Starting bid ($)'}))
+                                     widget=forms.NumberInput(attrs={'placeholder': 'Starting bid ($)'}))
 
     image = forms.URLField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Image url'}))
+                           widget=forms.TextInput(attrs={'placeholder': 'Image url'}))
 
     categury = forms.CharField(label="Categury", required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Categury'}))
+                               widget=forms.TextInput(attrs={'placeholder': 'Categury'}))
 
 
 class BidForm(forms.Form):
     """Bid Form"""
 
     bid = forms.DecimalField(max_digits=6, decimal_places=2,
-        widget=forms.NumberInput(attrs={'placeholder': 'Place your bid ($)'}))
+                             widget=forms.NumberInput(attrs={'placeholder': 'Place your bid ($)'}))
 
 
 def index(request):
@@ -181,6 +181,7 @@ def u_context(request, watchers, context):
     return None, None
 
 
+@login_required
 def wacth(request, user,  watchers, listing_obj, context):
     """add/remove watch list handler"""
 
@@ -199,6 +200,7 @@ def wacth(request, user,  watchers, listing_obj, context):
         context["color"] = color
 
 
+@login_required
 def place_bid(request, listing_obj, user, context):
     """add new bid handler"""
 
@@ -210,10 +212,10 @@ def place_bid(request, listing_obj, user, context):
 
             current_bid = form.cleaned_data["bid"]
 
-            bids = Bids.objects.get()
+            last_bid = Bids.objects.filter(listing=listing_obj).last()
 
             if (current_bid > listing_obj.current_bid)\
-                or (current_bid == listing_obj.current_bid == listing_obj.starting_bid):
+                    or ((current_bid == listing_obj.starting_bid) and (last_bid is None)):
 
                 bids = Bids()
                 bids.bidder = user
