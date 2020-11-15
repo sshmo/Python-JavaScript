@@ -1,5 +1,5 @@
 """
-This module contains the route handlers and forms.
+This module contains the route handlers.
 """
 
 from django.contrib.auth import authenticate, login, logout
@@ -8,35 +8,9 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django import forms
 
 from .models import User, Listings, Bids
-
-
-class CreateForm(forms.Form):
-    """Create Form"""
-
-    title = forms.CharField(label="Title",
-                            widget=forms.TextInput(attrs={'placeholder': 'Title'}))
-
-    description = forms.CharField(label="description",
-                                  widget=forms.TextInput(attrs={'placeholder': 'Description'}))
-
-    current_bid = forms.DecimalField(max_digits=6, decimal_places=2,
-                                     widget=forms.NumberInput(attrs={'placeholder': 'Starting bid ($)'}))
-
-    image = forms.URLField(required=False,
-                           widget=forms.TextInput(attrs={'placeholder': 'Image url'}))
-
-    categury = forms.CharField(label="Categury", required=False,
-                               widget=forms.TextInput(attrs={'placeholder': 'Categury'}))
-
-
-class BidForm(forms.Form):
-    """Bid Form"""
-
-    bid = forms.DecimalField(max_digits=6, decimal_places=2,
-                             widget=forms.NumberInput(attrs={'placeholder': 'Place your bid ($)'}))
+from . import util
 
 
 def index(request):
@@ -110,7 +84,7 @@ def register(request):
 def listing(request, listing_id):
     """Listing route handler"""
 
-    listing_obj, context = l_context(request, listing_id)
+    listing_obj, context = util.listing_context(request, listing_id)
 
     if not context:
         message = f'The "{listing_id}" page was not in the database.'
@@ -119,121 +93,25 @@ def listing(request, listing_id):
         })
 
     watchers = listing_obj.watchers.all()
-    user, user_context = u_context(request, watchers, context)
+    user, user_context = util.user_context(request, watchers, context)
 
     if not user_context:
         return render(request, "auctions/listing.html", context)
 
     if request.method == "POST":
 
-        wacth(request, user, watchers, listing_obj, context)
+        util.wacth(request, user, watchers, listing_obj, context)
 
-        message = place_bid(request, listing_obj, user, context)
+        message = util.place_bid(request, listing_obj, user, context)
 
-        if message == "Invalid bid":
+        message = util.close(request, user, listing_obj, context)
+
+        if message is not None:
             return render(request, "auctions/error.html", {
                 "message": message,
             })
 
     return render(request, "auctions/listing.html", context)
-
-
-def l_context(request, listing_id):
-    """listing id context maker"""
-
-    listing_obj = Listings.objects.get(pk=int(listing_id))
-
-    if listing_obj:
-        context = {
-            "title": listing_obj.title,
-            "description": listing_obj.description,
-            "current_bid": listing_obj.current_bid,
-            "image": listing_obj.image,
-            "categury": listing_obj.categury,
-            "form": BidForm(prefix='bid'),
-            "id": listing_id,
-        }
-
-        return listing_obj, context
-
-    return None, None
-
-
-def u_context(request, watchers, context):
-    """listing user context maker"""
-
-    if request.user.id:
-
-        user = User.objects.get(pk=int(request.user.id))
-
-        if user in watchers:
-            value = "remove"
-            color = "danger"
-        else:
-            value = "add"
-            color = "success"
-
-        context["value"] = value
-        context["color"] = color
-
-        return user, context
-
-    return None, None
-
-
-@login_required
-def wacth(request, user,  watchers, listing_obj, context):
-    """add/remove watch list handler"""
-
-    if 'watch' in request.POST:
-
-        if user in watchers:
-            listing_obj.watchers.remove(user)
-            value = "add"
-            color = "success"
-        else:
-            listing_obj.watchers.add(user)
-            value = "remove"
-            color = "danger"
-
-        context["value"] = value
-        context["color"] = color
-
-
-@login_required
-def place_bid(request, listing_obj, user, context):
-    """add new bid handler"""
-
-    if 'bid' in request.POST:
-
-        form = BidForm(request.POST, prefix='bid')
-
-        if form.is_valid():
-
-            current_bid = form.cleaned_data["bid"]
-
-            last_bid = Bids.objects.filter(listing=listing_obj).last()
-
-            if (current_bid > listing_obj.current_bid)\
-                    or ((current_bid == listing_obj.starting_bid) and (last_bid is None)):
-
-                bids = Bids()
-                bids.bidder = user
-                bids.listing = listing_obj
-                bids.bid = current_bid
-                bids.save()
-
-                listing_obj.current_bid = current_bid
-                listing_obj.save()
-
-                context["current_bid"] = current_bid
-
-            else:
-                return "Invalid bid"
-
-        else:
-            context["form"] = form
-    return None
 
 
 @login_required
@@ -261,7 +139,7 @@ def create_listings(request):
 
     if request.method == "POST":
 
-        form = CreateForm(request.POST)
+        form = util.CreateForm(request.POST)
 
         if form.is_valid():
 
@@ -287,7 +165,7 @@ def create_listings(request):
             })
     else:
         return render(request, "auctions/create.html", {
-            "form": CreateForm()
+            "form": util.CreateForm()
         })
 
 
