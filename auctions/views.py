@@ -125,7 +125,23 @@ def listing(request, listing_id):
 def categuries(request):
     """Categuries route handler"""
 
-    return render(request, "auctions/categuries.html")
+    categury_names = Listings.objects.all().values_list(
+        'categury', flat=True).distinct()
+
+    return render(request, "auctions/categuries.html", {
+        "categuries": categury_names
+    })
+
+
+@login_required
+def categury(request, name):
+    """categury route handler"""
+
+    items = Listings.objects.filter(categury=name)
+
+    return render(request, "auctions/index.html", {
+        "items": items
+    })
 
 
 @login_required

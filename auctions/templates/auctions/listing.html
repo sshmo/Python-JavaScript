@@ -73,7 +73,7 @@
 
     <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Comments</p>
 
-    <div class="border rounded-bottom mx-auto my-2" style="width:40% ;">
+    <div class="border rounded-bottom mx-auto my-0" style="width:40% ;">
     {% for comment in comments %}
         <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
             {{comment.commenter}}            
@@ -84,7 +84,7 @@
         <p class="d-flex border rounded mx-auto bg-light text-sm-left-justify p-1" style="width:90%;">{{comment.comment}} </p>
     {% endfor %}
     </div>
-
+    <p></p>
     {% if user.is_authenticated %}
         <form action="{% url 'auctions:listing' id %}" method="post">
             {% csrf_token %}
