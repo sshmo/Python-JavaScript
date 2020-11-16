@@ -1,8 +1,8 @@
 """
 This module contains util functions and forms.
 """
-from .models import User, Listings, Bids
 from django import forms
+from .models import User, Listings, Bids, Comments
 
 
 class CreateForm(forms.Form):
@@ -29,6 +29,13 @@ class BidForm(forms.Form):
 
     bid = forms.DecimalField(max_digits=6, decimal_places=2,
                              widget=forms.NumberInput(attrs={'placeholder': 'Place your bid ($)'}))
+
+
+class CommentForm(forms.Form):
+    """Comment Form"""
+
+    comment = forms.CharField(label="comment",
+                              widget=forms.Textarea(attrs={'placeholder': 'Add your comment'}))
 
 
 def place_bid(request, listing_obj, user, context):
@@ -62,7 +69,7 @@ def place_bid(request, listing_obj, user, context):
                 return "Invalid bid"
 
         else:
-            context["form"] = form
+            context["bid_form"] = form
     return None
 
 
@@ -96,12 +103,33 @@ def close(request, user, listing_obj, context):
     return None
 
 
+def comment(request, listing_obj, user, context):
+    """comment handler"""
+
+    if 'comment' in request.POST:
+
+        form = CommentForm(request.POST, prefix='comment')
+
+        if form.is_valid():
+
+            last_comment = form.cleaned_data["comment"]
+            comment_obj = Comments()
+            comment_obj.comment = last_comment
+            comment_obj.commenter = user
+            comment_obj.listing = listing_obj
+            comment_obj.save()
+
+        else:
+            context["comment_form"] = form
+
+
 def listing_context(request, listing_id):
-    """listing id context maker"""
+    """listing context maker"""
 
     listing_obj = Listings.objects.get(pk=int(listing_id))
     last_bid = Bids.objects.filter(listing=listing_obj).last()
     bidder = last_bid.bidder if last_bid is not None else None
+    comments = Comments.objects.filter(listing=listing_obj)
 
     if listing_obj:
         context = {
@@ -110,11 +138,13 @@ def listing_context(request, listing_id):
             "current_bid": listing_obj.current_bid,
             "image": listing_obj.image,
             "categury": listing_obj.categury,
-            "form": BidForm(prefix='bid'),
+            "bid_form": BidForm(prefix='bid'),
+            "comment_form": CommentForm(prefix='comment'),
             "id": listing_id,
             "status": "Active" if listing_obj.status else "Closed",
             "creator": listing_obj.creator,
             "bidder": bidder,
+            "comments": comments,
         }
 
         return listing_obj, context

@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listings, Bids
+from .models import User, Listings
 from . import util
 
 
@@ -102,7 +102,14 @@ def listing(request, listing_id):
 
         util.wacth(request, user, watchers, listing_obj, context)
 
+        util.comment(request, listing_obj, user, context)
+
         message = util.place_bid(request, listing_obj, user, context)
+
+        if message is not None:
+            return render(request, "auctions/error.html", {
+                "message": message,
+            })
 
         message = util.close(request, user, listing_obj, context)
 

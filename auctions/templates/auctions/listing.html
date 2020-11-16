@@ -6,67 +6,92 @@
 
 {% block body %}
             
-            {% if bidder == user and status == "Closed" %}
-            <h4 class="text-success font-weight-bold">Congratulations! you won the auction!</h4>
-            {% endif%}
+    {% if bidder == user and status == "Closed" %}
+    <h4 class="text-success font-weight-bold">Congratulations! you won the auction!</h4>
+    {% endif%}
 
 
-            <h4 class="font-weight-bold">{{title}}</h4>
+    <h4 class="font-weight-bold">{{title}}</h4>
 
 
-            {% if user.is_authenticated %}
-                <form action="{% url 'auctions:listing' id %}" method="post">
-                    {% csrf_token %}
-                    <input name = "watch" class="btn btn-{{color}} rounded-pill" style="font-size:80%;" type="submit" value="Watchlist">
-                </form>
-            <p></p>
-            {% endif%}
-
-            {% if image == "" or image == None %}
-                <img src="https://cdn0.iconfinder.com/data/icons/game-2-2/50/113-512.png" alt="No image available" width="100" height="100">
-            {% else %}
-                <img src={{image}} alt="No image available" width="100">
-            {% endif %}
-            <p></p>
+    {% if user.is_authenticated %}
+        <form action="{% url 'auctions:listing' id %}" method="post">
+            {% csrf_token %}
+            <input name = "watch" class="btn btn-{{color}} rounded-pill" style="font-size:80%;" type="submit" value="Watchlist">
+        </form>
+    <p></p>
+    {% endif%}
 
 
-            
-            <table class="table table-striped mx-auto" style="width:60%">
-                <thead class="thead-dark"> 
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Description</th>
-                        <th scope="col"> Bid($)</th>
-                        <th scope="col">Categury</th>
-                        <th scope="col">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        <tr>
-                            <th class="text-center" scope="row">{{id}}</th>
-                            <td class="text-center"> {{description}} </td>
-                            <td class="text-center">{{current_bid}}</td>
-                            <td class="text-center">{{categury}} </td>
-                            <td class="text-center primary">{{status}} </td>
-                        </tr>
-                </tbody>
-            </table>
+    {% if image == "" or image == None %}
+        <img src="https://cdn0.iconfinder.com/data/icons/game-2-2/50/113-512.png" alt="No image available" width="100" height="100">
+    {% else %}
+        <img src={{image}} alt="No image available" width="100">
+    {% endif %}
+    <p></p>
 
-        {% if user.is_authenticated and status == "Active" %}
-            <form action="{% url 'auctions:listing' id %}" method="post">
-                {% csrf_token %}
-                <div class="form-group"> {{form.bid }} </div>
-                <input name = "bid" class="btn btn-primary" type="submit" value="Place bid">
-            </form>
-            <p></p>
-        {% endif %}
+    
+    <table class="table table-striped mx-auto" style="width:60%">
+        <thead class="thead-dark"> 
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Description</th>
+                <th scope="col"> Bid($)</th>
+                <th scope="col">Categury</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <th class="text-center" scope="row">{{id}}</th>
+                    <td class="text-center"> {{description}} </td>
+                    <td class="text-center">{{current_bid}}</td>
+                    <td class="text-center">{{categury}} </td>
+                    <td class="text-center primary">{{status}} </td>
+                </tr>
+        </tbody>
+    </table>
 
-            {% if creator.id == user.id and status == "Active" %}
-            <form action="{% url 'auctions:listing' id %}" method="post">
-                {% csrf_token %}
-                <input name = "close" class="btn btn-danger" type="submit" value="Close auction">
-            </form>
-            <p></p>
-        {% endif %}
+
+    {% if user.is_authenticated and status == "Active" %}
+        <form action="{% url 'auctions:listing' id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group"> {{bid_form.bid }} </div>
+            <input name = "bid" class="btn btn-primary" type="submit" value="Place bid">
+        </form>
+        <p></p>
+    {% endif %}
+    
+
+    {% if creator.id == user.id and status == "Active" %}
+        <form action="{% url 'auctions:listing' id %}" method="post">
+            {% csrf_token %}
+            <input name = "close" class="btn btn-danger" type="submit" value="Close auction">
+        </form>
+        <p></p>
+    {% endif %}
+
+    <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Comments</p>
+
+    <div class="border rounded-bottom mx-auto my-2" style="width:40% ;">
+    {% for comment in comments %}
+        <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
+            {{comment.commenter}}            
+            <small class="text-secondary text-right p-1">
+                posted {{comment.comments_time}} 
+            </small>
+        </p>
+        <p class="d-flex border rounded mx-auto bg-light text-sm-left-justify p-1" style="width:90%;">{{comment.comment}} </p>
+    {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+        <form action="{% url 'auctions:listing' id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group"> {{comment_form.comment }} </div>
+            <input name = "comment" class="btn btn-primary" type="submit" value="Add comment">
+        </form>
+        <p></p>
+    {% endif %}
 
 {% endblock %}
