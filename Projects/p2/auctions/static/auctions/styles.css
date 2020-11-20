@@ -1,0 +1,27 @@
+body {
+    padding: 20px;
+}
+
+a.nav-link:hover,
+a.nav-link:active {
+  text-decoration: underline;
+}
+
+main .form-control
+{
+    /* center form controls */
+    display: inline-block;
+
+    /* override Bootstrap's 100% width for form controls */
+    width: auto;
+    text-align: center;
+}
+
+main
+{
+    /* scroll horizontally as needed */
+    overflow-x: auto;
+
+    /* center contents */
+    text-align: center;
+}
