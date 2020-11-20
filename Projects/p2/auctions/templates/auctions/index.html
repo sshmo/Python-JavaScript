@@ -19,7 +19,8 @@
                         </div>
 
                         <div class="col my-auto">
-                            <a href="{% url 'auctions:listing' item.id %}">{{ item.title }}</a>
+                            <p class="my-0"><a href="{% url 'auctions:listing' item.id %}">{{ item.title }}</a></p>
+                            <small><span class="text-secondary ml-3">  {{ item.description }} </span></small>
                         </div>
 
                         <div class="col my-auto">
@@ -33,9 +34,6 @@
                             </small>
                         </div>
                     </div>
-
-                    <span class="text-secondary">  {{ item.description }} </span>
-                    
                 </div>
                 <p></p>
 

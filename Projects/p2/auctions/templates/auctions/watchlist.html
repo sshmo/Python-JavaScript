@@ -5,7 +5,7 @@
     <h3>Watchlist</h3>
     
         {% for item in items %}
-            <div class="container border rounded" style="width:70%;">
+            <div class="container border rounded" style="width:80%;">
                 
                 <div class="row">
                 
@@ -18,7 +18,8 @@
                     </div>
 
                     <div class="col my-auto">
-                        <a href="{% url 'auctions:listing' item.id %}">{{ item.title }}</a>
+                        <p><a href="{% url 'auctions:listing' item.id %}">{{ item.title }}</a></p>
+                        <small><span class="text-secondary ml-3">  {{ item.description }} </span></small>
                     </div>
 
                     <div class="col my-auto">
