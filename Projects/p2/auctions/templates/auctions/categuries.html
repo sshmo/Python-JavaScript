@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h3>Categuries</h3>
+
+    {% for cat in categuries %}
+    <div class= "conrainer mx-auto border rounded" style="width:30%;%">
+        <div class ="row">
+            <ul>
+                <li> 
+                    <a href="{% url 'auctions:categury' cat %}">{{ cat }}</a>
+                </li>
+            </ul>
+        </div>    
+    </div>
+    <p></p>
+    {% endfor %}
+
+{% endblock %}

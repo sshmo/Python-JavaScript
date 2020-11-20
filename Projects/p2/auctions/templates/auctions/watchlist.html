@@ -1,0 +1,46 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h3>Watchlist</h3>
+    
+        {% for item in items %}
+            <div class="container border rounded" style="width:80%;">
+                
+                <div class="row">
+                
+                    <div class="col my-auto mr-0 p-0">
+                        {% if item.image == "" or item.image == None %}
+                            <img src="https://cdn0.iconfinder.com/data/icons/game-2-2/50/113-512.png" alt="No image available" width="100" height="100">
+                        {% else %}
+                            <img src={{item.image}} alt="No image available" width="100">
+                        {% endif %}
+                    </div>
+
+                    <div class="col my-auto">
+                        <p><a href="{% url 'auctions:listing' item.id %}">{{ item.title }}</a></p>
+                        <small><span class="text-secondary ml-3">  {{ item.description }} </span></small>
+                    </div>
+
+                    <div class="col my-auto">
+                        Price {{ item.current_bid }} $
+                    </div>
+
+                    <div class="col my-auto mr-0 text-secondary">
+                        <p>  
+                            {% if item.status %}
+                                <span class="text-success"> Active </span>
+                            {% else %}
+                                <span class="text-danger"> Closed </span>
+                            {% endif %}
+                        <p>
+                    </div>
+
+                </div>
+
+                </div>
+            </div>
+            <p></p>
+        {% endfor %}
+    
+{% endblock %}
