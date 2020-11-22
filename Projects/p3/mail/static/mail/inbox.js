@@ -15,43 +15,51 @@ document.addEventListener("DOMContentLoaded", function () {
   load_mailbox("inbox");
 });
 
-function compose_email() {
+function compose_email(context) {
   // Show compose view and hide other views
   document.querySelector("#email-view").style.display = "none";
   document.querySelector("#emails-view").style.display = "none";
   document.querySelector("#compose-view").style.display = "block";
 
-  document
-    .querySelector("#compose-form")
-    .addEventListener("submit", (event) => {
-      var recip = document.querySelector("#compose-recipients").value;
-      var subj = document.querySelector("#compose-subject").value;
-      var bod = document.querySelector("#compose-body").value;
+  // Pre fill the form if context was provided
+  if (`${context}` != "[object MouseEvent]") {
+    document.querySelector("#compose-recipients").value = context["recipient"];
 
-      fetch("/emails", {
-        method: "POST",
-        body: JSON.stringify({
-          recipients: recip,
-          subject: subj,
-          body: bod,
-        }),
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          // Print result
-          console.log(result);
-        });
+    document.querySelector("#compose-subject").value = context["subject"];
 
-      // Clear out composition fields
-      document.querySelector("#compose-recipients").value = "";
-      document.querySelector("#compose-subject").value = "";
-      document.querySelector("#compose-body").value = "";
+    document.querySelector(
+      "#compose-body"
+    ).value = `On ${context["timestamp"]} ${context["recipient"]} wrote: \n\n ${context["body"]}`;
+  }
 
-      //load the sent box
-      load_mailbox("sent");
+  // Compose email when it is submitted
+  document.querySelector("#compose-form").addEventListener("submit", () => {
+    var recip = document.querySelector("#compose-recipients").value;
+    var subj = document.querySelector("#compose-subject").value;
+    var bod = document.querySelector("#compose-body").value;
 
-      event.preventDefault();
-    });
+    fetch("/emails", {
+      method: "POST",
+      body: JSON.stringify({
+        recipients: recip,
+        subject: subj,
+        body: bod,
+      }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        // Print result
+        console.log(result);
+      });
+
+    // Clear out composition fields
+    document.querySelector("#compose-recipients").value = "";
+    document.querySelector("#compose-subject").value = "";
+    document.querySelector("#compose-body").value = "";
+    
+    load_mailbox("sent");
+
+  });
 }
 
 function load_mailbox(mailbox) {
@@ -87,7 +95,7 @@ function load_mailbox(mailbox) {
 
         // Add click listener to each email
         row.addEventListener("click", function () {
-          load_email(email["id"]);
+          load_email(email["id"], mailbox);
         });
 
         const col_1 = document.createElement("div");
@@ -109,7 +117,7 @@ function load_mailbox(mailbox) {
     });
 }
 
-function load_email(email_id) {
+function load_email(email_id, mailbox) {
   // Show the email and hide other views
   document.querySelector("#compose-view").style.display = "none";
   document.querySelector("#emails-view").style.display = "none";
@@ -123,54 +131,73 @@ function load_email(email_id) {
       read: true,
     }),
   });
-      
+
   const container = document.createElement("div");
-  container.className = "container w-75";
+  container.className = "container";
 
   // Show the email
   fetch(`/emails/${email_id}`)
     .then((response) => response.json())
     .then((email) => {
-      
-      const row_1 = document.createElement("div");
-      row_1.className = `row border rounded my-1 align-text-middle text-dark`;
-      container.appendChild(row_1);
+      const info = document.createElement("div");
+      container.appendChild(info);
+      info.innerHTML = `<b>Subject: </b>${email["subject"]}<br>
+                        <b>From: </b>${email["sender"]}<br>
+                        <b>To: </b>${email["recipients"]}<br>
+                        <b>Timestamp: </b>${email["timestamp"]}`;
 
-      const col_1_1 = document.createElement("div");
-      col_1_1.className = "col";
-      row_1.appendChild(col_1_1);
-      col_1_1.innerHTML = `Subject: ${email["subject"]}`;
+      if (mailbox != "sent") {
+        const archive = document.createElement("button");
+        archive.className = "btn btn-sm btn-outline-primary m";
+        archive_str = email["archived"] ? "Unarchive" : "Archive";
+        archive.innerHTML = archive_str;
+        archive.addEventListener("click", function () {
+          archive_email(email_id, archive_str);
+        });
+        container.appendChild(archive);
+      }
 
-      const row_2 = document.createElement("div");
-      row_2.className = `row border rounded my-1 align-text-middle text-dark`;
-      container.appendChild(row_2);
+      const reply = document.createElement("button");
+      reply.className = "btn btn-sm btn-outline-primary m-2";
+      reply.innerHTML = "Reply";
+      reply.addEventListener("click", function () {
+        subject_has_re =
+          email["subject"].charAt(0) +
+            email["subject"].charAt(1) +
+            email["subject"].charAt(2) ===
+          "Re:"
+            ? true
+            : false;
 
-      const col_2_1 = document.createElement("div");
-      col_2_1.className = "col";
-      row_2.appendChild(col_2_1);
-      col_2_1.innerHTML = `From: ${email["sender"]}`;
+        context = {
+          recipient: email["sender"],
+          subject: subject_has_re ? email["subject"] : "Re:" + email["subject"],
+          timestamp: email["timestamp"],
+          body: email["body"],
+        };
 
-      const col_2_2 = document.createElement("div");
-      col_2_2.className = "col";
-      row_2.appendChild(col_2_2);
-      col_2_2.innerHTML = `To: ${email["recipients"]}`;
+        compose_email(context);
+      });
+      container.appendChild(reply);
 
-      const col_2_3 = document.createElement("div");
-      col_2_3.className = "col";
-      row_2.appendChild(col_2_3);
-      col_2_3.innerHTML = `On: ${email["timestamp"]}`;
-
-
-      const row_3 = document.createElement("div");
-      row_3.className = `row border rounded my-1 align-text-middle text-dark`;
-      container.appendChild(row_3);
-
-      const col_3_1 = document.createElement("div");
-      col_3_1.className = "col h-100px";
-      row_3.appendChild(col_3_1);
-      col_3_1.innerHTML = `${email["body"]}`;
-
+      const textarea = document.createElement("textarea");
+      textarea.className = "col text-dark";
+      textarea.setAttribute("disabled", "true");
+      container.appendChild(textarea);
+      textarea.innerHTML = `${email["body"]}`;
 
       document.querySelector("#email-view").append(container);
     });
+}
+
+async function archive_email(email_id, archive_str) {
+  // Mark email as Archive
+  fetch(`/emails/${email_id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      archived: archive_str === "Archive" ? true : false,
+    }),
+  });
+  await new Promise((r) => setTimeout(r, 50));
+  load_mailbox("inbox");
 }
