@@ -2,13 +2,15 @@
 
 {% block body %}
 
+<div class='w-25 mx-auto'>
+
     <h2>Login</h2>
 
     {% if message %}
         <div>{{ message }}</div>
     {% endif %}
 
-    <form action="{% url 'login' %}" method="post">
+    <form action="{% url 'network:login' %}" method="post">
         {% csrf_token %}
         <div class="form-group">
             <input autofocus class="form-control" type="text" name="username" placeholder="Username">
@@ -19,6 +21,7 @@
         <input class="btn btn-primary" type="submit" value="Login">
     </form>
 
-    Don't have an account? <a href="{% url 'register' %}">Register here.</a>
+    Don't have an account? <a href="{% url 'network:register' %}">Register here.</a>
 
+</div>
 {% endblock %}

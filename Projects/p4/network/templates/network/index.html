@@ -1,5 +1,32 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+<div class='mx-auto'>
+    {% load static %}
+    {% if user.is_authenticated %}
+    <form action="{% url 'network:index' %}" method="post" class="mx-auto" style="width:40%;">
+        {% csrf_token %}
+        <div class="form-group"> {{post_form.post }} </div>
+        <input name = "post" class="btn btn-primary" type="submit" value="Post">
+    </form>
+    <p></p>
+    {% endif %}
+
+    <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Posts</p>
+    
+    <div class="border rounded-bottom mx-auto my-0" style="width:40% ;">
+        {% for post in posts %}
+            <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
+                {{post.poster}}            
+                <small class="text-secondary text-right p-1">
+                    posted {{post.post_time}} 
+                </small>
+            </p>
+            <p class="d-flex border rounded mx-auto bg-light text-sm-left-justify p-1 my-0" style="width:90%;">{{post.post}} </p>
+            <img class="ml-4 mb-2 mt-1" src="{% static 'network/like.png' %}" alt="No image available" width="20" height="20">
+            {{post.likes}} 
+        {% endfor %}
+        </div>
+
+</div>    
 {% endblock %}
