@@ -1,20 +1,26 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
+
+{% load static %}
+
 <div class='mx-auto'>
-    {% load static %}
-    {% if user.is_authenticated %}
-    <form action="{% url 'network:index' %}" method="post" class="mx-auto" style="width:40%;">
+    
+    <h2 class='mx-auto' style='width:40%;'>{{profile_user.username}}</h2>
+
+    <p class='mx-auto text-info' style='width:40%;'>Followers: {{followers_count}} Following: {{following_count}} </p>
+
+    {% if user.is_authenticated and user.id != profile_user.id %}
+    <form action="{% url 'network:profile' profile_user.id %}" method="post" class='mx-auto text-info' style='width:40%;'>
         {% csrf_token %}
-        <div class="form-group mb-0"> {{post_form.post }} </div>
-        <input name = "post" class="btn btn-primary" type="submit" value="Post">
+        <input name = "follow" class="btn btn-{{follow_color}} rounded-pill" style="font-size:80%;" type="submit" value="Follow">
     </form>
     <p></p>
-    {% endif %}
+    {% endif%}
 
-    <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Posts</p>
     
-    <div class="border rounded-bottom mx-auto my-0" style="width:40% ;">
+    <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Posts</p>
+    <div class="border rounded-bottom mx-auto my-0" style="width:40%;">
         {% for post in posts %}
             <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
                 <a href="{% url 'network:profile' post.poster.id %}"> {{post.poster}}</a>         

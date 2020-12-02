@@ -4,18 +4,26 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 
-from .models import User, Post
+from .models import User, Post, Follow
+
 
 class PostForm(forms.Form):
     """Post Form"""
 
     post = forms.CharField(label="post",
-                              widget=forms.Textarea(attrs={'placeholder': 'Write a new post', 'rows': 1, 'cols': 45,}))
+                           widget=forms.Textarea(attrs={'placeholder': ' Write a new post', 'rows': 1, 'cols': 45, 'style': 'margin-bottom:0'}))
+
 
 def index(request):
 
-    context = general_context(request)
+    posts = Post.objects.all().order_by('-post_time')
+
+    context = {
+        "post_form": PostForm(prefix='post'),
+        "posts": posts,
+    }
 
     if request.method == "POST":
 
@@ -54,6 +62,8 @@ def logout_view(request):
 
 
 def register(request):
+    """register route handler"""
+
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -80,7 +90,52 @@ def register(request):
         return render(request, "network/register.html")
 
 
-def post(request, user, context):
+def profile(request, user_id):
+    """user profile handler"""
+
+    profile_user = User.objects.get(pk=int(user_id))
+    posts = Post.objects.filter(poster=profile_user).order_by('-post_time')
+
+    try:
+        profile_follow_obj = Follow.objects.get(user=profile_user)
+    except ObjectDoesNotExist:
+        profile_follow_obj = Follow.objects.create(user=profile_user)
+        profile_follow_obj = Follow.objects.get(user=profile_user)
+
+    profile_following = profile_follow_obj.following.all()
+    profile_following_count = profile_following.count()
+
+    profile_followers = profile_follow_obj.followers.all()
+    profile_followers_count = profile_followers.count()
+
+    context = {
+        'profile_user': profile_user,
+        'posts': posts,
+        "following_count": profile_following_count,
+        "followers_count": profile_followers_count,
+    }
+
+    if request.user.id:
+        current_user = User.objects.get(pk=int(request.user.id))
+
+        context['follow_color'] = "primary" if current_user in profile_followers else "outline-primary"
+        context['current_user'] = current_user
+
+        try:
+            current_follow_obj = Follow.objects.get(user=current_user)
+        except ObjectDoesNotExist:
+            current_follow_obj = Follow.objects.create(user=current_user)
+            current_follow_obj = Follow.objects.get(user=current_user)
+
+    if 'follow' in request.POST:
+
+        follow(request, current_user, profile_user, profile_followers,
+               profile_follow_obj, current_follow_obj, profile_followers_count, context)
+
+    return render(request, "network/profile.html", context)
+
+
+def post(request, current_user, context):
     """post handler"""
 
     if 'post' in request.POST:
@@ -92,21 +147,61 @@ def post(request, user, context):
             last_post = form.cleaned_data["post"]
             post_obj = Post()
             post_obj.post = last_post
-            post_obj.poster = user
+            post_obj.poster = current_user
             post_obj.save()
 
         else:
             context["post_form"] = form
 
 
-def general_context(request):
-    """general context handler"""
+def follow(request, current_user, profile_user, profile_followers, profile_follow_obj, current_follow_obj, profile_followers_count, context):
+    """add/remove follow list handler"""
 
-    posts = Post.objects.all().order_by('-post_time')
+    if 'follow' in request.POST:
+
+        if current_user in profile_followers:
+            profile_follow_obj.followers.remove(current_user)
+            current_follow_obj.following.remove(profile_user)
+            color = "outline-primary"
+            profile_followers_count -= 1
+        else:
+            profile_follow_obj.followers.add(current_user)
+            current_follow_obj.following.add(profile_user)
+            profile_followers_count += 1
+            color = "primary"
+
+        profile_follow_obj.save()
+        current_follow_obj.save()
+        context["follow_color"] = color
+        context["followers_count"] = profile_followers_count
+
+
+def following(request):
+
+    current_user = User.objects.get(pk=int(request.user.id))
+
+    try:
+        current_follow_obj = Follow.objects.get(user=current_user)
+    except ObjectDoesNotExist:
+        current_follow_obj = Follow.objects.create(user=current_user)
+        current_follow_obj = Follow.objects.get(user=current_user)
+    
+    following = current_follow_obj.following.all()
+
+    posts = Post.objects.filter(poster__in=following).order_by('-post_time')
+
 
     context = {
-    "post_form": PostForm(prefix='post'),
-    "posts": posts,
+        "post_form": PostForm(prefix='post'),
+        "posts": posts,
     }
 
-    return context
+    if request.method == "POST":
+
+        user = User.objects.get(pk=int(request.user.id))
+
+        print(user)
+
+        post(request, user, context)
+
+    return render(request, "network/index.html", context)
