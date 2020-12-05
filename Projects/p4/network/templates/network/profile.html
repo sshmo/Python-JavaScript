@@ -20,8 +20,24 @@
 
     
     <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Posts</p>
-    <div class="border rounded-bottom mx-auto my-0" style="width:40%;">
-        {% for post in posts %}
+
+    <div class="border rounded-bottom mx-auto my-0" style="width:40% ;">
+
+        <ul class="pagination mx-auto my-0" style="width:90% ;">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>   
+                <li class="page-item"></li><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>           
+            {% endif %}
+            {% if page_obj.has_next %}                
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
+            {% endif %}
+            <li class="page-item my-auto p-1 text-primary ml-auto">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </li>
+        </ul>
+    
+        {% for post in page_obj %}
             <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
                 <a href="{% url 'network:profile' post.poster.id %}"> {{post.poster}}</a>         
                 <small class="text-secondary text-right p-1">
