@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 from .models import User, Post, Follow
 
@@ -18,11 +19,14 @@ class PostForm(forms.Form):
 
 def index(request):
 
-    posts = Post.objects.all().order_by('-post_time')
+    post_list = Post.objects.all().order_by('-post_time')
+    paginator = Paginator(post_list, 10) # Show 10 contacts per page.
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
         "post_form": PostForm(prefix='post'),
-        "posts": posts,
+        'page_obj': page_obj,
     }
 
     if request.method == "POST":
@@ -94,7 +98,11 @@ def profile(request, user_id):
     """user profile handler"""
 
     profile_user = User.objects.get(pk=int(user_id))
-    posts = Post.objects.filter(poster=profile_user).order_by('-post_time')
+
+    post_list = Post.objects.filter(poster=profile_user).order_by('-post_time')
+    paginator = Paginator(post_list, 10) # Show 10 contacts per page.
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     try:
         profile_follow_obj = Follow.objects.get(user=profile_user)
@@ -110,7 +118,7 @@ def profile(request, user_id):
 
     context = {
         'profile_user': profile_user,
-        'posts': posts,
+        'page_obj': page_obj,
         "following_count": profile_following_count,
         "followers_count": profile_followers_count,
     }
@@ -188,12 +196,15 @@ def following(request):
     
     following = current_follow_obj.following.all()
 
-    posts = Post.objects.filter(poster__in=following).order_by('-post_time')
+    post_list = Post.objects.filter(poster__in=following).order_by('-post_time')
+    paginator = Paginator(post_list, 10) # Show 10 contacts per page.
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
 
     context = {
         "post_form": PostForm(prefix='post'),
-        "posts": posts,
+        'page_obj': page_obj,
     }
 
     if request.method == "POST":
