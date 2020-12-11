@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Google Images</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!--header controls the position of top links-->
+    <header>
+
+        <!--Top left links-->
+        <nav>
+            <a class="top_links" href="index.html">Search</a>
+
+            <!-- Google apps link implemented as a squre dott svg file -->
+            <a class="google_apps" href="https://www.google.com/intl/en/about/products" role="button">
+                <svg focusable="false" viewBox="0 0 24 24">
+                    <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,
+                                2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 
+                                2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,
+                                14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,
+                                -0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,
+                                -2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2
+                                0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,
+                                20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z">
+                    </path>
+                </svg>
+            </a>
+
+            <!--sign_in link as a button like object -->
+            <a class="sign_in" href="https://accounts.google.com/">Sign in</a>
+        </nav>
+    </header>
+
+    <!--Google_logo controls the position of google logo-->
+    <div class="google_logo">
+
+        <!--Google logo implementation image as a class-->
+        <div title="Google Images" id="hplogo">
+
+            <!--Google image text-->
+            <div class="logo-subtext">
+                <span>images</span>
+            </div>
+        </div>
+    </div>
+
+    <!--search class controls the position of search form -->
+    <section class="search">
+
+        <!--The image search form-->
+        <form action="https://google.com/search" data-submitfalse="q" id="tsf" method="GET" name="f" role="search">
+
+            <!--Attributes that will become GET parameters when the form is submitted-->
+            <input name="hl" value="en" type="hidden">
+            <input name="tbm" value="isch" type="hidden">
+            <input name="source" type="hidden" value="hp">
+            <input name="biw" type="hidden">
+            <input name="bih" type="hidden">
+
+            <!--These divs controle the srarch objects position -->
+            <div class="search_box_out">
+                <div class="search_box_in">
+
+                    <!--The search box magnifying glass (gray) logo implementation as a svg file-->
+                    <div class="search_box_logo">
+                        <span class="search_logo">
+                            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5
+                                        0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 
+                                        19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14
+                                    9.5 11.99 14 9.5 14z"></path>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <!--Image search box input-->
+                    <div class="search_box_input">
+                        <input class="serch_input" maxlength="2048" name="q" type="text" title="Search">
+                    </div>
+
+                    <!--Camera_img implementation as class-->
+                    <div class="camera_loc">
+                        <span class="camera_img"></span>
+                    </div>
+
+                    <!--The search box magnifying glass (blue) button implementation as a svg file-->
+                    <button class="button_img_search" aria-label="Google Search" type="submit">
+                        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
+                            <path
+                                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 
+                                16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 
+                                14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                            </path>
+                        </svg>
+                    </button>
+
+                </div>
+            </div>
+        </form>
+    </section>
+</body>
+
+</html>

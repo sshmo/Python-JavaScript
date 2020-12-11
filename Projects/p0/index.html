@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Google</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!--header class controls the position of top links-->
+    <header>
+
+        <!--top right links-->
+        <a class="about_store" href="https://about.google.com">About</a>
+        <a class="about_store" href="https://store.google.com/">Store</a>
+
+        <!--top left links-->
+        <nav>
+            <a class="top_links" href="advanced.html">Advanced</a>
+            <a class="top_links" href="images.html">Images</a>
+
+            <!-- google apps link implemented as a squre dott svg file -->
+            <a class="google_apps" href="https://www.google.com/intl/en/about/products" role="button">
+                <svg focusable="false" viewBox="0 0 24 24">
+                    <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,
+                                2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 
+                                2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,
+                                14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,
+                                -0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,
+                                -2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2
+                                0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,
+                                20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z">
+                    </path>
+                </svg>
+            </a>
+
+            <!--sign_in link as a button like object -->
+            <a class="sign_in" href="https://accounts.google.com/">Sign in</a>
+        </nav>
+    </header>
+
+    <!--google_logo controls the position of google logo-->
+    <div class="google_logo">
+        <img alt="Google" src="googlelogo.png" data-atf="1" width="272" height="92">
+    </div>
+
+    <!--search class controls the position of search form -->
+    <section class="search">
+
+        <!--the search form-->
+        <form action="https://google.com/search" method="GET" role="search">
+
+            <!--These divs controle the srarch objects position -->
+            <div class="search_box_out">
+                <div class="search_box_in">
+
+                    <!--the search box magnifying glass logo implementation as a svg file-->
+                    <div class="search_box_logo">
+                        <span class="search_logo">
+                            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5
+                                            0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 
+                                            19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14
+                                        9.5 11.99 14 9.5 14z">
+                                </path>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <!--search box input-->
+                    <div class="search_box_input">
+                        <input class="serch_input" maxlength="2048" name="q" type="text" jsaction="paste:puy29d"
+                            aria-autocomplete="both" aria-haspopup="false" autocapitalize="off" autocomplete="off"
+                            autocorrect="off" autofocus="" role="combobox" spellcheck="false" title="Search" value=""
+                            aria-label="Search">
+                    </div>
+
+                </div>
+            </div>
+
+            <!--Google Search and I'm Feeling Lucky buttons-->
+            <div class="serch_button">
+                <input value="Google Search" name="btnK" type="submit">
+                <input value="I'm Feeling Lucky" name="btnI" type="submit">
+            </div>
+
+        </form>
+    </section>
+</body>
+
+</html>
