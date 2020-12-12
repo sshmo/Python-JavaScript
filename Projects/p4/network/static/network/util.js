@@ -52,3 +52,43 @@ function save(post_id) {
     });
 }
 
+function like(ids) {
+
+    ids = ids.split(",")
+    var post_id = parseInt(ids[0])
+    var user_id = parseInt(ids[1])
+
+    var likes =  parseInt(document.getElementById(`likes${post_id}`).innerHTML)
+
+    // get the post likers
+    fetch(`/posts/${post_id}`)
+    .then((response) => response.json())
+    .then((post) => {
+        
+        var likers = post["likers"]
+        var liked = false
+        var baseURL = "http://127.0.0.1:8000/static/network/"
+    
+        // add or remove liker
+        if (!likers.includes(user_id)) {
+            liked = true
+            likes += 1
+            document.getElementById(`like${post_id}`).src = baseURL + 'like1.png'
+        }
+        else {
+            likes -=1
+            document.getElementById(`like${post_id}`).src = baseURL + 'like.png'
+        }
+
+        document.getElementById(`likes${post_id}`).innerHTML = likes
+
+        // Save post in database
+        fetch(`/posts/${post_id}`, {
+            method: "PUT",
+            body: JSON.stringify({
+                liked: liked,
+                user: user_id,
+            }),
+        });
+    })
+}

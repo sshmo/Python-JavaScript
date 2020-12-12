@@ -14,7 +14,7 @@ from .models import User, Post, Follow
 
 
 class PostForm(forms.Form):
-    """Post Form"""
+    """ Post Form """
 
     post = forms.CharField(label="post",
                            widget=forms.Textarea(attrs={'placeholder': ' Write a new post', 'rows': 1, 'cols': 45, 'style': 'margin-bottom:0'}))
@@ -227,7 +227,7 @@ def posts(request, post_id):
 
     # Query for requested Post
     try:
-        post_obj = Post.objects.get(poster=request.user, pk=post_id)
+        post_obj = Post.objects.get(pk=post_id)
     except Post.DoesNotExist:
         return JsonResponse({"error": "Post not found."}, status=404)
 
@@ -237,15 +237,24 @@ def posts(request, post_id):
 
     # Update whether post is liked or should be edited
     elif request.method == "PUT":
+
         data = json.loads(request.body)
+
         if data.get("edit") is not None:
             post_obj.post = data["edit"]
-        if data.get("like") is not None:
-            post_obj.likes += data["like"]
+
+        if data.get("liked") is not None:
+
+            if data["liked"]:
+                post_obj.likers.add(User.objects.get(pk=int(data["user"])))
+
+            else:
+                post_obj.likers.remove(User.objects.get(pk=int(data["user"])))
+
         post_obj.save()
         return HttpResponse(status=204)
 
-    # Email must be via GET or PUT
+    # Post must be via GET or PUT
     else:
         return JsonResponse({
             "error": "GET or PUT request required."
