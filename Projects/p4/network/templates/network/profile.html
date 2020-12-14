@@ -57,7 +57,7 @@
                 <p id="likes{{post.id}}" class="ml-1">{{post.likes}}</p>
                 
                 {% if user.id == post.poster.id %} 
-                    <button id="edit{{post.id}}" onclick="edit('{{post.id}}')" class="btn btn-primary ml-auto">Edit</button>
+                    <button id="edit{{post.id}}" onclick="edit('{{post.id}}')" class="btn btn-outline-primary ml-auto">Edit</button>
                 {% endif %}
             </div>
         {% endfor %}
