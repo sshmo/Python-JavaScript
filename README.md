@@ -3,14 +3,14 @@
 
 
 
-### The libraries and framworks used in this project are:
+The libraries and framworks used in this project are:
 
   - **Django:** Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
   - **markdown2:** In order to convert markdown fils to html.
 
 
 
-### The projects that the course proposed to build are:
+The projects that the course proposed to build are:
 
   0. ***Search***
 
