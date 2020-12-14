@@ -1,30 +1,33 @@
 # Python-JavaScript
   This Python-JavaScript project includes my code implementation of the corresponding [course](https://cs50.harvard.edu/web/2020/).
 
-The libraries and framworks used in this project are:
-
-- **Django** Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
-- **markdown2** In order to convert markdown fils to html.
 
 
-The projects that the course proposed to build are:
+### The libraries and framworks used in this project are:
 
-0. ***Search***
+  - **Django:** Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
+  - **markdown2:** In order to convert markdown fils to html.
 
-    Design a front-end for Google Search, Google Image Search, and Google Advanced Search.
 
-1. ***Wiki***
 
-    Design a Wikipedia-like online encyclopedia.
+### The projects that the course proposed to build are:
 
-2. ***Commerce***
+  0. ***Search***
 
-    Design an eBay-like e-commerce auction site that will allow users to post auction listings, place bids on listings, comment on those listings, and add listings to a “watchlist.”
+      Design a front-end for Google Search, Google Image Search, and Google Advanced Search.
 
-3. ***Mail***
+  1. ***Wiki***
 
-    Design a front-end for an email client that makes API calls to send and receive emails.
+      Design a Wikipedia-like online encyclopedia.
 
-4. ***Network***
+  2. ***Commerce***
 
-    Design a Twitter-like social network website for making posts and following users.
+      Design an eBay-like e-commerce auction site that will allow users to post auction listings, place bids on listings, comment on those listings, and add listings to a “watchlist.”
+
+  3. ***Mail***
+
+      Design a front-end for an email client that makes API calls to send and receive emails.
+
+  4. ***Network***
+
+      Design a Twitter-like social network website for making posts and following users.
