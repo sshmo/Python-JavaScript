@@ -1,24 +1,32 @@
 import random
-import markdown2
+
 from django import forms
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+
+import markdown2
 from . import util
 
 
 class NewForm(forms.Form):
-    """New form"""
+    """ New form """
     title = forms.CharField(label="Title")
     content = forms.CharField(widget=forms.Textarea, label="Content")
 
 
 class EditForm(forms.Form):
-    """Edit form"""
+    """ Edit form """
     content = forms.CharField(widget=forms.Textarea, label="Content")
 
 
 def index(request):
+    """
+        Index route handler
+
+        Inputs: request
+        Output: Index page
+    """
 
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
@@ -26,10 +34,24 @@ def index(request):
 
 
 def entry(request, title):
+    """ 
+        Entry route handler
 
+        Inputs: 
+            request 
+            title of the page
+
+        Output: 
+            Entry page
+            If not exists then raise error
+    """
+
+    # get page content using util function
     content = util.get_entry(title)
-    
+
     if content:
+
+        # convert the content to markdown format
         content = markdown2.markdown(text=content)
         return render(request, "encyclopedia/entry.html", {
             "content": content,
@@ -43,25 +65,47 @@ def entry(request, title):
 
 
 def search(request):
+    """ 
+        Search route handler
 
+        Inputs: 
+            request 
+
+        Output: 
+            Found exact page
+            If not exists then list of similar pages
+            If not found raise error
+    """
+
+    # get the page title using "q" key
     title = request.GET['q']
+
+    # get page content using util function
     content = util.get_entry(title)
-    
+
+    # if exact match was found:
     if content:
+
+        # convert the content to markdown format
         content = markdown2.markdown(text=content)
         return render(request, "encyclopedia/entry.html", {
             "content": content,
             "title": title,
         })
-    
+
+    # if exact match was not found try to find similar pages
     entries = util.list_entries()
+
+    # find similar pages
     results = [entry for entry in entries if title.lower() in entry.lower()]
-    
+
+    # if similar pages was found:
     if results:
         return render(request, "encyclopedia/results.html", {
             "entries": results,
         })
- 
+
+    # if nothing was found:
     else:
         message = f'There is no page containing "{title}" in the database.'
         return render(request, "encyclopedia/error.html", {
@@ -70,9 +114,23 @@ def search(request):
 
 
 def random_page(request):
+    """ 
+        Random page handler 
 
+        Inputs: 
+            request 
+
+        Output: 
+            random page
+    """
+
+    # find random page using choice function
     title = random.choice(util.list_entries())
+
+    # get page content using util function
     content = util.get_entry(title)
+
+    # convert the content to markdown format
     content = markdown2.markdown(text=content)
 
     return render(request, "encyclopedia/entry.html", {
@@ -82,6 +140,16 @@ def random_page(request):
 
 
 def new(request):
+    """ 
+        New page handler 
+
+        Inputs: 
+            request 
+
+        Output: 
+            Makes a new page
+            If title was already taken raise error
+    """
 
     if request.method == "POST":
 
@@ -116,6 +184,16 @@ def new(request):
 
 
 def edit(request, title):
+    """ 
+        Edit page handler 
+
+        Inputs: 
+            request
+            title of the target page 
+
+        Output: 
+            Edited page
+    """
 
     if request.method == "POST":
 
@@ -149,6 +227,16 @@ def edit(request, title):
 
 
 def error_handler(request, message):
+    """ 
+        Error handler 
+
+        Inputs: 
+            request
+            error message 
+
+        Output: 
+            Error page with the message
+    """
 
     return render(request, "encyclopedia/error.html", {
         "message": message,

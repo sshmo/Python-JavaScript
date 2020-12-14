@@ -14,7 +14,15 @@ from . import util
 
 
 def index(request):
-    """Index route handler"""
+    """
+        Index route handler
+
+        Inputs: 
+            request 
+
+        Output: 
+            Index exact page
+    """
 
     items = Listings.objects.all()
 
@@ -84,6 +92,10 @@ def register(request):
 def listing(request, listing_id):
     """Listing route handler"""
 
+    # using th listing id, create base context for the listing
+    # context includes:
+    # title, description, current_bid, image, categury, bid_form
+    # comment_form, id, status, creator, bidder and comments
     listing_obj, context = util.listing_context(request, listing_id)
 
     if not context:
@@ -92,7 +104,10 @@ def listing(request, listing_id):
             "message": message,
         })
 
+    # if the listing exists, find all watchers of the listing
     watchers = listing_obj.watchers.all()
+
+    # update the watcher color in context and find the current user
     user, user_context = util.user_context(request, watchers, context)
 
     if not user_context:
@@ -100,19 +115,25 @@ def listing(request, listing_id):
 
     if request.method == "POST":
 
+        # Atemp to watch/unwatch:
         util.wacth(request, user, watchers, listing_obj, context)
 
+        # Attemp to comment:
         util.comment(request, listing_obj, user, context)
 
+        # Attemp to bid:
         message = util.place_bid(request, listing_obj, user, context)
 
+        # if bid is invalid show error message
         if message is not None:
             return render(request, "auctions/error.html", {
                 "message": message,
             })
 
+        # Attemp to close the bid
         message = util.close(request, user, listing_obj, context)
 
+        # if non of the Attemps were handled show error message
         if message is not None:
             return render(request, "auctions/error.html", {
                 "message": message,
@@ -125,6 +146,7 @@ def listing(request, listing_id):
 def categuries(request):
     """Categuries route handler"""
 
+    # Find all distinct categuries
     categury_names = Listings.objects.all().values_list(
         'categury', flat=True).distinct()
 
@@ -179,7 +201,6 @@ def create_listings(request):
 
             listings.save()
 
-            # util.save_entry(title, content)
             return HttpResponseRedirect(reverse("auctions:index"))
 
         else:
