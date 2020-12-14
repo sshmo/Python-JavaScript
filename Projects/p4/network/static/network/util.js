@@ -35,7 +35,7 @@ function save(post_id) {
     save_btn = document.getElementById(`save${post_id}`)
     var edit_btn = document.createElement(tagName='button')
     edit_btn.innerText = "Edit"
-    edit_btn.className = "btn btn-primary ml-auto"
+    edit_btn.className = "btn btn-outline-primary ml-auto"
     edit_btn.id = `edit${post_id}`
     edit_btn.addEventListener("click", ()=>{
         edit(post_id)
