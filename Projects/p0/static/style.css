@@ -234,7 +234,7 @@ a.sign_in {
 
 @media (max-device-pixel-ratio: 1), (max-resolution: 96dpi) {
   #hplogo {
-    background: url(googlelogo.png) no-repeat;
+    background: url(./googlelogo.png) no-repeat;
   }
 }
 
@@ -260,7 +260,7 @@ a.sign_in {
 .camera_img {
   height: 24px;
   width: 24px;
-  background: url("camera.png") 0 0 no-repeat;
+  background: url("./camera.png") 0 0 no-repeat;
   background-size: 24px;
 }
 
