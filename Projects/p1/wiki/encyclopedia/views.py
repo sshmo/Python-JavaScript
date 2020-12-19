@@ -34,14 +34,14 @@ def index(request):
 
 
 def entry(request, title):
-    """ 
+    """
         Entry route handler
 
-        Inputs: 
-            request 
+        Inputs:
+            request
             title of the page
 
-        Output: 
+        Output:
             Entry page
             If not exists then raise error
     """
@@ -65,13 +65,13 @@ def entry(request, title):
 
 
 def search(request):
-    """ 
+    """
         Search route handler
 
-        Inputs: 
-            request 
+        Inputs:
+            request
 
-        Output: 
+        Output:
             Found exact page
             If not exists then list of similar pages
             If not found raise error
@@ -114,13 +114,13 @@ def search(request):
 
 
 def random_page(request):
-    """ 
-        Random page handler 
+    """
+        Random page handler
 
-        Inputs: 
-            request 
+        Inputs:
+            request
 
-        Output: 
+        Output:
             random page
     """
 
@@ -140,13 +140,13 @@ def random_page(request):
 
 
 def new(request):
-    """ 
-        New page handler 
+    """
+        New page handler
 
-        Inputs: 
-            request 
+        Inputs:
+            request
 
-        Output: 
+        Output:
             Makes a new page
             If title was already taken raise error
     """
@@ -184,14 +184,14 @@ def new(request):
 
 
 def edit(request, title):
-    """ 
-        Edit page handler 
+    """
+        Edit page handler
 
-        Inputs: 
+        Inputs:
             request
-            title of the target page 
+            title of the target page
 
-        Output: 
+        Output:
             Edited page
     """
 
@@ -227,14 +227,14 @@ def edit(request, title):
 
 
 def error_handler(request, message):
-    """ 
-        Error handler 
+    """
+        Error handler
 
-        Inputs: 
+        Inputs:
             request
-            error message 
+            error message
 
-        Output: 
+        Output:
             Error page with the message
     """
 

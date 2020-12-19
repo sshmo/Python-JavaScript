@@ -34,10 +34,12 @@ function compose_email(context) {
 
   // Compose email when it is submitted
   document.querySelector("#compose-form").addEventListener("submit", () => {
+    // Get the value of recipients, subject and body from th submitted form
     var recip = document.querySelector("#compose-recipients").value;
     var subj = document.querySelector("#compose-subject").value;
     var bod = document.querySelector("#compose-body").value;
 
+    // post the values via API
     fetch("/emails", {
       method: "POST",
       body: JSON.stringify({
@@ -58,8 +60,11 @@ function compose_email(context) {
     document.querySelector("#compose-body").value = "";
   });
 
+  // Load the sent box
   document.querySelector("#compose-form").addEventListener("submit", () => {
     load_mailbox("sent");
+
+    // Prevent the events from further bubbling
     event.stopImmediatePropagation();
   });
 }
@@ -71,6 +76,7 @@ function load_mailbox(mailbox) {
   document.querySelector("#emails-view").innerHTML = "";
   document.querySelector("#emails-view").style.display = "block";
 
+  // Create the base bootstrap container element
   const container = document.createElement("div");
   container.className = "container mx-auto";
 
@@ -86,8 +92,10 @@ function load_mailbox(mailbox) {
       emails.forEach((email) => {
         const row = document.createElement("div");
 
+        // Show each email in a row
         row.className = `row border rounded my-1 align-text-middle text-dark`;
 
+        // Set the background color based on the read status of the email
         const bgc = !email["read"]
           ? " background-color: white;"
           : " background-color: #E8E8E8;";
@@ -100,16 +108,19 @@ function load_mailbox(mailbox) {
           load_email(email["id"], mailbox);
         });
 
+        // Add sender to the email element
         const col_1 = document.createElement("div");
         col_1.className = "col";
         row.appendChild(col_1);
         col_1.innerHTML = `From: ${email["sender"]}`;
 
+        // Add subject to the email element
         const col_2 = document.createElement("div");
         row.appendChild(col_2);
         col_2.className = "col";
         col_2.innerHTML = `Subject: ${email["subject"]}`;
 
+        // Add timestamp to the email element
         const col_3 = document.createElement("div");
         row.appendChild(col_3);
         col_3.className = "col";
@@ -134,6 +145,7 @@ function load_email(email_id, mailbox) {
     }),
   });
 
+  // Create the base bootstrap container element
   const container = document.createElement("div");
   container.className = "container";
 
@@ -147,7 +159,8 @@ function load_email(email_id, mailbox) {
                         <b>From: </b>${email["sender"]}<br>
                         <b>To: </b>${email["recipients"]}<br>
                         <b>Timestamp: </b>${email["timestamp"]}`;
-
+      
+      // Allow the user to archive or unarchive an email in the inbox and archive tabs
       if (mailbox != "sent") {
         const archive = document.createElement("button");
         archive.className = "btn btn-sm btn-outline-primary m";
@@ -159,10 +172,13 @@ function load_email(email_id, mailbox) {
         container.appendChild(archive);
       }
 
+      // add reply button to an element
       const reply = document.createElement("button");
       reply.className = "btn btn-sm btn-outline-primary m-2";
       reply.innerHTML = "Reply";
       reply.addEventListener("click", function () {
+        
+        // If subject has Re, do not add Re to the subject
         subject_has_re =
           email["subject"].charAt(0) +
             email["subject"].charAt(1) +
@@ -177,11 +193,12 @@ function load_email(email_id, mailbox) {
           timestamp: email["timestamp"],
           body: email["body"],
         };
-
+        // use compos email function to send email
         compose_email(context);
       });
       container.appendChild(reply);
 
+      // Show rhe email body in the bottom of the email
       const textarea = document.createElement("textarea");
       textarea.className = "col text-dark";
       textarea.setAttribute("disabled", "true");
@@ -200,6 +217,8 @@ async function archive_email(email_id, archive_str) {
       archived: archive_str === "Archive" ? true : false,
     }),
   });
+
+  // Wait a moment before loading inbox to let the PUT action be done
   await new Promise((r) => setTimeout(r, 50));
   load_mailbox("inbox");
 }

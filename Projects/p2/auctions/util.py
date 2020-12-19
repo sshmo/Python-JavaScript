@@ -73,7 +73,7 @@ def place_bid(request, listing_obj, user, context):
     return None
 
 
-def wacth(request, user,  watchers, listing_obj, context):
+def wacth(request, user, watchers, listing_obj, context):
     """add/remove watch list handler"""
 
     if 'watch' in request.POST:

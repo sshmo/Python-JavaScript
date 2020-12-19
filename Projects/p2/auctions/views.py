@@ -17,10 +17,10 @@ def index(request):
     """
         Index route handler
 
-        Inputs: 
-            request 
+        Inputs:
+            request
 
-        Output: 
+        Output:
             Index exact page
     """
 
@@ -159,6 +159,7 @@ def categuries(request):
 def categury(request, name):
     """categury route handler"""
 
+    # show all items that fall in a categury name
     items = Listings.objects.filter(categury=name)
 
     return render(request, "auctions/index.html", {
@@ -171,6 +172,8 @@ def watchlist(request):
     """Watchlist route handler"""
 
     user = User.objects.get(pk=int(request.user.id))
+    
+    # show all items  in a specific user watchlist
     items = user.listings_set.all()
 
     return render(request, "auctions/watchlist.html", {
@@ -191,6 +194,7 @@ def create_listings(request):
             user = User.objects.get(pk=int(request.user.id))
             listings = Listings()
 
+            # add listing specs to the listing table
             listings.creator = user
             listings.title = form.cleaned_data["title"]
             listings.description = form.cleaned_data["description"]
