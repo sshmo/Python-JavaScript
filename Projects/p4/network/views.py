@@ -1,44 +1,45 @@
 import json
+
+from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse
-from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from django.db import IntegrityError
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Post, Follow
+from .models import Follow, Post, User
 
 
 class PostForm(forms.Form):
-    """ Post Form """
+    """Post Form"""
 
-    post = forms.CharField(label="post",
-                           widget=forms.Textarea(
-                               attrs={'placeholder': ' Write a new post',
-                                      'rows': 1,
-                                      'cols': 45,
-                                      'style': 'margin-bottom:0'}))
+    post = forms.CharField(
+        label="post",
+        widget=forms.Textarea(
+            attrs={"placeholder": " Write a new post", "rows": 1, "cols": 45, "style": "margin-bottom:0"}
+        ),
+    )
 
 
 def index(request):
-    """ Index route handler """
+    """Index route handler"""
 
     # Make a list of all posts
-    post_list = Post.objects.all().order_by('-post_time')
+    post_list = Post.objects.all().order_by("-post_time")
 
     # Create a paginator instance for 10 posts per page
     paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     # Make the html context
     context = {
-        "post_form": PostForm(prefix='post'),
-        'page_obj': page_obj,
+        "post_form": PostForm(prefix="post"),
+        "page_obj": page_obj,
     }
 
     # if the user atttemps to write a new post
@@ -55,7 +56,7 @@ def index(request):
 
 
 def login_view(request):
-    """ Login view handler """
+    """Login view handler"""
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -68,16 +69,14 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("network:index"))
         else:
-            return render(request, "network/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return render(request, "network/login.html", {"message": "Invalid username and/or password."})
     else:
         return render(request, "network/login.html")
 
 
 @login_required
 def logout_view(request):
-    """ Logout view handler """
+    """Logout view handler"""
     logout(request)
     return HttpResponseRedirect(reverse("network:index"))
 
@@ -93,18 +92,14 @@ def register(request):
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
-            return render(request, "network/register.html", {
-                "message": "Passwords must match."
-            })
+            return render(request, "network/register.html", {"message": "Passwords must match."})
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "network/register.html", {
-                "message": "Username already taken."
-            })
+            return render(request, "network/register.html", {"message": "Username already taken."})
         login(request, user)
         return HttpResponseRedirect(reverse("network:index"))
     else:
@@ -118,11 +113,11 @@ def profile(request, user_id):
     profile_user = User.objects.get(pk=int(user_id))
 
     # Make a list of all of the profile user posts
-    post_list = Post.objects.filter(poster=profile_user).order_by('-post_time')
+    post_list = Post.objects.filter(poster=profile_user).order_by("-post_time")
 
     # Create a paginator instance for 10 posts per page
     paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     # Get the profile follow data
@@ -143,8 +138,8 @@ def profile(request, user_id):
 
     # create a new html context
     context = {
-        'profile_user': profile_user,
-        'page_obj': page_obj,
+        "profile_user": profile_user,
+        "page_obj": page_obj,
         "following_count": profile_following_count,
         "followers_count": profile_followers_count,
     }
@@ -156,11 +151,9 @@ def profile(request, user_id):
         current_user = User.objects.get(pk=int(request.user.id))
 
         # uodate html context for the follow button color
-        context['follow_color'] = ("primary"
-                                   if current_user in profile_followers
-                                   else "outline-primary")
+        context["follow_color"] = "primary" if current_user in profile_followers else "outline-primary"
         # add current user to the context
-        context['current_user'] = current_user
+        context["current_user"] = current_user
 
         # Get the current user follow data
         # if it does not exists make a new one and get that
@@ -171,27 +164,32 @@ def profile(request, user_id):
             current_follow_obj = Follow.objects.get(user=current_user)
 
     # if current user attemps to follow/unfollow the profile user:
-    if 'follow' in request.POST:
+    if "follow" in request.POST:
 
         # Attemp to update the follow state of profile and current user
-        follow(request,
-               current_user, profile_user,
-               profile_followers,
-               profile_follow_obj, current_follow_obj,
-               profile_followers_count, context)
-    
+        follow(
+            request,
+            current_user,
+            profile_user,
+            profile_followers,
+            profile_follow_obj,
+            current_follow_obj,
+            profile_followers_count,
+            context,
+        )
+
     # finally load the profile page
     return render(request, "network/profile.html", context)
 
 
 @login_required
 def post(request, current_user, context):
-    """ post handler """
+    """post handler"""
 
     # a\Attemp to save the post
-    if 'post' in request.POST:
+    if "post" in request.POST:
 
-        form = PostForm(request.POST, prefix='post')
+        form = PostForm(request.POST, prefix="post")
 
         if form.is_valid():
 
@@ -207,14 +205,19 @@ def post(request, current_user, context):
 
 
 @login_required
-def follow(request,
-           current_user, profile_user,
-           profile_followers,
-           profile_follow_obj, current_follow_obj,
-           profile_followers_count, context):
+def follow(
+    request,
+    current_user,
+    profile_user,
+    profile_followers,
+    profile_follow_obj,
+    current_follow_obj,
+    profile_followers_count,
+    context,
+):
     """add/remove follow list handler"""
 
-    if 'follow' in request.POST:
+    if "follow" in request.POST:
 
         # update the following and followers data for the current user and profile user
         if current_user in profile_followers:
@@ -236,7 +239,7 @@ def follow(request,
 
 @login_required
 def following(request):
-    """ following page handler """
+    """following page handler"""
 
     # get the current user
     current_user = User.objects.get(pk=int(request.user.id))
@@ -248,23 +251,22 @@ def following(request):
     except ObjectDoesNotExist:
         current_follow_obj = Follow.objects.create(user=current_user)
         current_follow_obj = Follow.objects.get(user=current_user)
-    
+
     # find all users that the current user follows
     following_obj = current_follow_obj.following.all()
 
     # Make a list of all posts from the users the current user follows
-    post_list = Post.objects.filter(
-        poster__in=following_obj).order_by('-post_time')
+    post_list = Post.objects.filter(poster__in=following_obj).order_by("-post_time")
 
     # Create a paginator instance for 10 posts per page
     paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     # Make the html context
     context = {
-        "post_form": PostForm(prefix='post'),
-        'page_obj': page_obj,
+        "post_form": PostForm(prefix="post"),
+        "page_obj": page_obj,
     }
 
     # if the user atttemps to write a new post
@@ -280,7 +282,7 @@ def following(request):
 @csrf_exempt
 @login_required
 def posts(request, post_id):
-    """ posts API route """
+    """posts API route"""
 
     # Query for requested Post
     try:
@@ -316,6 +318,4 @@ def posts(request, post_id):
 
     # Post must be via GET or PUT
     else:
-        return JsonResponse({
-            "error": "GET or PUT request required."
-        }, status=400)
+        return JsonResponse({"error": "GET or PUT request required."}, status=400)

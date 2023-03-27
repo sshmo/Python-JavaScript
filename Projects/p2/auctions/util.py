@@ -2,48 +2,48 @@
 This module contains util functions and forms.
 """
 from django import forms
-from .models import User, Listings, Bids, Comments
+
+from .models import Bids, Comments, Listings, User
 
 
 class CreateForm(forms.Form):
     """Create Form"""
 
-    title = forms.CharField(label="Title",
-                            widget=forms.TextInput(attrs={'placeholder': 'Title'}))
+    title = forms.CharField(label="Title", widget=forms.TextInput(attrs={"placeholder": "Title"}))
 
-    description = forms.CharField(label="description",
-                                  widget=forms.TextInput(attrs={'placeholder': 'Description'}))
+    description = forms.CharField(label="description", widget=forms.TextInput(attrs={"placeholder": "Description"}))
 
-    current_bid = forms.DecimalField(max_digits=6, decimal_places=2,
-                                     widget=forms.NumberInput(attrs={'placeholder': 'Starting bid ($)'}))
+    current_bid = forms.DecimalField(
+        max_digits=6, decimal_places=2, widget=forms.NumberInput(attrs={"placeholder": "Starting bid ($)"})
+    )
 
-    image = forms.URLField(required=False,
-                           widget=forms.TextInput(attrs={'placeholder': 'Image url'}))
+    image = forms.URLField(required=False, widget=forms.TextInput(attrs={"placeholder": "Image url"}))
 
-    categury = forms.CharField(label="Categury", required=False,
-                               widget=forms.TextInput(attrs={'placeholder': 'Categury'}))
+    categury = forms.CharField(
+        label="Categury", required=False, widget=forms.TextInput(attrs={"placeholder": "Categury"})
+    )
 
 
 class BidForm(forms.Form):
     """Bid Form"""
 
-    bid = forms.DecimalField(max_digits=6, decimal_places=2,
-                             widget=forms.NumberInput(attrs={'placeholder': 'Place your bid ($)'}))
+    bid = forms.DecimalField(
+        max_digits=6, decimal_places=2, widget=forms.NumberInput(attrs={"placeholder": "Place your bid ($)"})
+    )
 
 
 class CommentForm(forms.Form):
     """Comment Form"""
 
-    comment = forms.CharField(label="comment",
-                              widget=forms.Textarea(attrs={'placeholder': 'Add your comment'}))
+    comment = forms.CharField(label="comment", widget=forms.Textarea(attrs={"placeholder": "Add your comment"}))
 
 
 def place_bid(request, listing_obj, user, context):
     """add new bid handler"""
 
-    if 'bid' in request.POST:
+    if "bid" in request.POST:
 
-        form = BidForm(request.POST, prefix='bid')
+        form = BidForm(request.POST, prefix="bid")
 
         if form.is_valid():
 
@@ -51,8 +51,9 @@ def place_bid(request, listing_obj, user, context):
 
             last_bid = Bids.objects.filter(listing=listing_obj).last()
 
-            if (current_bid > listing_obj.current_bid)\
-                    or ((current_bid == listing_obj.starting_bid) and (last_bid is None)):
+            if (current_bid > listing_obj.current_bid) or (
+                (current_bid == listing_obj.starting_bid) and (last_bid is None)
+            ):
 
                 bids = Bids()
                 bids.bidder = user
@@ -76,7 +77,7 @@ def place_bid(request, listing_obj, user, context):
 def wacth(request, user, watchers, listing_obj, context):
     """add/remove watch list handler"""
 
-    if 'watch' in request.POST:
+    if "watch" in request.POST:
 
         if user in watchers:
             listing_obj.watchers.remove(user)
@@ -91,7 +92,7 @@ def wacth(request, user, watchers, listing_obj, context):
 def close(request, user, listing_obj, context):
     """closes the bid if owner wants"""
 
-    if 'close' in request.POST:
+    if "close" in request.POST:
 
         if user == listing_obj.creator:
             listing_obj.status = False
@@ -106,9 +107,9 @@ def close(request, user, listing_obj, context):
 def comment(request, listing_obj, user, context):
     """comment handler"""
 
-    if 'comment' in request.POST:
+    if "comment" in request.POST:
 
-        form = CommentForm(request.POST, prefix='comment')
+        form = CommentForm(request.POST, prefix="comment")
 
         if form.is_valid():
 
@@ -138,8 +139,8 @@ def listing_context(request, listing_id):
             "current_bid": listing_obj.current_bid,
             "image": listing_obj.image,
             "categury": listing_obj.categury,
-            "bid_form": BidForm(prefix='bid'),
-            "comment_form": CommentForm(prefix='comment'),
+            "bid_form": BidForm(prefix="bid"),
+            "comment_form": CommentForm(prefix="comment"),
             "id": listing_id,
             "status": "Active" if listing_obj.status else "Closed",
             "creator": listing_obj.creator,

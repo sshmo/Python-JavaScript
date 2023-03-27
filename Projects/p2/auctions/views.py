@@ -9,26 +9,24 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listings
 from . import util
+from .models import Listings, User
 
 
 def index(request):
     """
-        Index route handler
+    Index route handler
 
-        Inputs:
-            request
+    Inputs:
+        request
 
-        Output:
-            Index exact page
+    Output:
+        Index exact page
     """
 
     items = Listings.objects.all()
 
-    return render(request, "auctions/index.html", {
-        'items': items
-    })
+    return render(request, "auctions/index.html", {"items": items})
 
 
 def login_view(request):
@@ -46,9 +44,7 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("auctions:index"))
         else:
-            return render(request, "auctions/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return render(request, "auctions/login.html", {"message": "Invalid username and/or password."})
     else:
         return render(request, "auctions/login.html")
 
@@ -71,18 +67,14 @@ def register(request):
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
-            return render(request, "auctions/register.html", {
-                "message": "Passwords must match."
-            })
+            return render(request, "auctions/register.html", {"message": "Passwords must match."})
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "auctions/register.html", {
-                "message": "Username already taken."
-            })
+            return render(request, "auctions/register.html", {"message": "Username already taken."})
         login(request, user)
         return HttpResponseRedirect(reverse("auctions:index"))
     else:
@@ -100,9 +92,13 @@ def listing(request, listing_id):
 
     if not context:
         message = f'The "{listing_id}" page was not in the database.'
-        return render(request, "auctions/error.html", {
-            "message": message,
-        })
+        return render(
+            request,
+            "auctions/error.html",
+            {
+                "message": message,
+            },
+        )
 
     # if the listing exists, find all watchers of the listing
     watchers = listing_obj.watchers.all()
@@ -126,18 +122,26 @@ def listing(request, listing_id):
 
         # if bid is invalid show error message
         if message is not None:
-            return render(request, "auctions/error.html", {
-                "message": message,
-            })
+            return render(
+                request,
+                "auctions/error.html",
+                {
+                    "message": message,
+                },
+            )
 
         # Attemp to close the bid
         message = util.close(request, user, listing_obj, context)
 
         # if non of the Attemps were handled show error message
         if message is not None:
-            return render(request, "auctions/error.html", {
-                "message": message,
-            })
+            return render(
+                request,
+                "auctions/error.html",
+                {
+                    "message": message,
+                },
+            )
 
     return render(request, "auctions/listing.html", context)
 
@@ -147,12 +151,9 @@ def categuries(request):
     """Categuries route handler"""
 
     # Find all distinct categuries
-    categury_names = Listings.objects.all().values_list(
-        'categury', flat=True).distinct()
+    categury_names = Listings.objects.all().values_list("categury", flat=True).distinct()
 
-    return render(request, "auctions/categuries.html", {
-        "categuries": categury_names
-    })
+    return render(request, "auctions/categuries.html", {"categuries": categury_names})
 
 
 @login_required
@@ -162,9 +163,7 @@ def categury(request, name):
     # show all items that fall in a categury name
     items = Listings.objects.filter(categury=name)
 
-    return render(request, "auctions/index.html", {
-        "items": items
-    })
+    return render(request, "auctions/index.html", {"items": items})
 
 
 @login_required
@@ -172,13 +171,11 @@ def watchlist(request):
     """Watchlist route handler"""
 
     user = User.objects.get(pk=int(request.user.id))
-    
+
     # show all items  in a specific user watchlist
     items = user.listings_set.all()
 
-    return render(request, "auctions/watchlist.html", {
-        "items": items
-    })
+    return render(request, "auctions/watchlist.html", {"items": items})
 
 
 @login_required
@@ -208,18 +205,18 @@ def create_listings(request):
             return HttpResponseRedirect(reverse("auctions:index"))
 
         else:
-            return render(request, "auctions/create.html", {
-                "form": form
-            })
+            return render(request, "auctions/create.html", {"form": form})
     else:
-        return render(request, "auctions/create.html", {
-            "form": util.CreateForm()
-        })
+        return render(request, "auctions/create.html", {"form": util.CreateForm()})
 
 
 def error_handler(request, message):
     """Error route handler"""
 
-    return render(request, "encyclopedia/error.html", {
-        "message": message,
-    })
+    return render(
+        request,
+        "encyclopedia/error.html",
+        {
+            "message": message,
+        },
+    )
