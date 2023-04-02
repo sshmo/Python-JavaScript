@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function edit(post_id) {
-    
+
     edit_btn = document.getElementById(`edit${post_id}`)
     post = document.getElementById(`post${post_id}`)
 
@@ -22,13 +22,13 @@ function edit(post_id) {
     })
     edit_btn.parentNode.appendChild(save_btn)
     edit_btn.parentNode.removeChild(edit_btn)
-    
+
 }
 
 function save(post_id) {
     textarea_node = document.getElementById(`text${post_id}`)
     post_content = textarea_node.value
-    
+
     post = document.getElementById(`post${post_id}`)
     post.innerHTML = post_content
 
@@ -64,11 +64,11 @@ function like(ids) {
     fetch(`/posts/${post_id}`)
     .then((response) => response.json())
     .then((post) => {
-        
+
         var likers = post["likers"]
         var liked = false
         var baseURL = "http://127.0.0.1:8000/static/network/"
-    
+
         // add or remove liker
         if (!likers.includes(user_id)) {
             liked = true

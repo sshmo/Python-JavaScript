@@ -15,7 +15,7 @@
   <body>
 
     <div class="d-flex">
-    
+
     <img src="{% static 'auctions/hammer.png' %}" alt="No image available" width="40" height="40">
 
     <div class="p-1">
@@ -55,9 +55,9 @@
 
     <div class="d-flex">
       <div class="p-1 mr-auto">
-        {% if user.is_authenticated %} 
-            Signed in as <strong>{{ user.username }}</strong>. 
-        {% else %} 
+        {% if user.is_authenticated %}
+            Signed in as <strong>{{ user.username }}</strong>.
+        {% else %}
             Not signed in.
         {% endif%}
       </div>

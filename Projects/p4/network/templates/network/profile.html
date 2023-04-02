@@ -5,7 +5,7 @@
 {% load static %}
 
 <div class='mx-auto'>
-    
+
     <h2 class='mx-auto' style='width:40%;'>{{profile_user.username}}</h2>
 
     <p class='mx-auto text-info' style='width:40%;'>Followers: {{followers_count}} Following: {{following_count}} </p>
@@ -18,17 +18,17 @@
     <p></p>
     {% endif%}
 
-    
+
     <P class="border rounded-top bg-info text-white mx-auto my-0 p-1" style="width:40%">Posts</p>
 
     <div class="border rounded-bottom mx-auto my-0" style="width:40% ;">
 
         <ul class="pagination mx-auto my-0" style="width:90% ;">
             {% if page_obj.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>   
-                <li class="page-item"></li><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>           
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                <li class="page-item"></li><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>
             {% endif %}
-            {% if page_obj.has_next %}                
+            {% if page_obj.has_next %}
                 <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a></li>
                 <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
             {% endif %}
@@ -36,34 +36,34 @@
                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
             </li>
         </ul>
-    
+
         {% for post in page_obj %}
             <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
-                <a href="{% url 'network:profile' post.poster.id %}"> {{post.poster}}</a>         
+                <a href="{% url 'network:profile' post.poster.id %}"> {{post.poster}}</a>
                 <small class="text-secondary text-right p-1">
-                    posted {{post.post_time}} 
+                    posted {{post.post_time}}
                 </small>
             </p>
             <p id="post{{post.id}}" class="d-flex border rounded mx-auto bg-light text-sm-left-justify p-1 my-0" style="width:90%;">{{post.post}} </p>
 
             <div class="row mx-auto my-0 p-1" style="width:90%;">
-                
+
                 {% if user.id in post.serialize.likers %}
                     <img id="like{{post.id}}" onclick="like('{{post.id}},{{user.id}}')" class="ml-1 mb-2 mt-1" src="{% static 'network/like1.png' %}" alt="No image available" width="20" height="20">
                 {% else %}
                     <img id="like{{post.id}}" onclick="like('{{post.id}},{{user.id}}')" class="ml-1 mb-2 mt-1" src="{% static 'network/like.png' %}" alt="No image available" width="20" height="20">
                 {% endif %}
-                
+
                 <p id="likes{{post.id}}" class="ml-1">{{post.likes}}</p>
-                
-                {% if user.id == post.poster.id %} 
+
+                {% if user.id == post.poster.id %}
                     <button id="edit{{post.id}}" onclick="edit('{{post.id}}')" class="btn btn-outline-primary ml-auto">Edit</button>
                 {% endif %}
             </div>
         {% endfor %}
     </div>
 
-</div>    
+</div>
 {% endblock %}
 
 {% block script %}

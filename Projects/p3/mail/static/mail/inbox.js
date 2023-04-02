@@ -159,7 +159,7 @@ function load_email(email_id, mailbox) {
                         <b>From: </b>${email["sender"]}<br>
                         <b>To: </b>${email["recipients"]}<br>
                         <b>Timestamp: </b>${email["timestamp"]}`;
-      
+
       // Allow the user to archive or unarchive an email in the inbox and archive tabs
       if (mailbox != "sent") {
         const archive = document.createElement("button");
@@ -177,7 +177,7 @@ function load_email(email_id, mailbox) {
       reply.className = "btn btn-sm btn-outline-primary m-2";
       reply.innerHTML = "Reply";
       reply.addEventListener("click", function () {
-        
+
         // If subject has Re, do not add Re to the subject
         subject_has_re =
           email["subject"].charAt(0) +

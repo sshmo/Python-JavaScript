@@ -4,20 +4,19 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    """ User model """
+    """User model"""
 
 
 class Post(models.Model):
-    """ Post model """
+    """Post model"""
 
-    poster = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="poster")
+    poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name="poster")
     post = models.TextField()
     post_time = models.DateTimeField(default=timezone.now)
     likers = models.ManyToManyField(User, related_name="post_likers")
 
     def serialize(self):
-        """ Converts the post content to json format """
+        """Converts the post content to json format"""
         return {
             "id": self.id,
             "poster": self.poster.username,
@@ -27,14 +26,13 @@ class Post(models.Model):
         }
 
     def likes(self):
-        """ Total likes counter """
+        """Total likes counter"""
         return self.likers.all().count()
 
 
 class Follow(models.Model):
-    """ Following model """
+    """Following model"""
 
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="follow_user")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="follow_user")
     following = models.ManyToManyField(User, related_name="follow_following")
     followers = models.ManyToManyField(User, related_name="follow_followers")

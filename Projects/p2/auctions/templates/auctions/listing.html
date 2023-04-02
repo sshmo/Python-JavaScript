@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-            
+
     {% if bidder == user and status == "Closed" %}
     <h4 class="text-success font-weight-bold">Congratulations! you won the auction!</h4>
     {% endif%}
@@ -30,9 +30,9 @@
     {% endif %}
     <p></p>
 
-    
+
     <table class="table table-striped mx-auto" style="width:60%">
-        <thead class="thead-dark"> 
+        <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Description</th>
@@ -61,7 +61,7 @@
         </form>
         <p></p>
     {% endif %}
-    
+
 
     {% if creator.id == user.id and status == "Active" %}
         <form action="{% url 'auctions:listing' id %}" method="post">
@@ -76,9 +76,9 @@
     <div class="border rounded-bottom mx-auto my-0" style="width:40% ;">
     {% for comment in comments %}
         <p class="text-info d-flex rounded mx-auto my-0 p-1" style="width:90% ;">
-            {{comment.commenter}}            
+            {{comment.commenter}}
             <small class="text-secondary text-right p-1">
-                posted {{comment.comments_time}} 
+                posted {{comment.comments_time}}
             </small>
         </p>
         <p class="d-flex border rounded mx-auto bg-light text-sm-left-justify p-1" style="width:90%;">{{comment.comment}} </p>
